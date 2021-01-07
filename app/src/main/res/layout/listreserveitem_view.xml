@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="#0D7E7E7E"
+    app:cardBackgroundColor="#FFFFFF"
+    app:cardCornerRadius="5dp"
+    app:cardUseCompatPadding="true">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="10dp">
+
+        <TextView
+            android:id="@+id/userName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentTop="true"
+            android:layout_marginStart="2dp"
+            android:layout_marginTop="1dp"
+            android:textAppearance="?android:attr/textAppearanceListItem"
+            android:textIsSelectable="false"
+            android:textSize="17sp"
+            android:textStyle="bold"
+            tools:text="백홍열" />
+
+        <TextView
+            android:id="@+id/status1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignTop="@id/userName"
+            android:layout_alignParentEnd="true"
+            android:layout_centerInParent="true"
+            android:layout_toEndOf="@id/userName"
+            android:background="#00FFFFFF"
+            android:gravity="right"
+            android:textAppearance="?android:attr/textAppearanceListItem"
+            android:textIsSelectable="false"
+            android:textSize="17sp"
+            tools:text="완료" />
+
+        <TextView
+            android:id="@+id/periodTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/userName"
+            android:layout_marginStart="3dp"
+            tools:text="2020-09-11 16:30 ~ 2020-12-12 20:22" />
+
+    </RelativeLayout>
+</androidx.cardview.widget.CardView>

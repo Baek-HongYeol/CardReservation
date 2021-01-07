@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">CardReservation</string>
+    <string name="ok">확인</string>
+    <string name="resEmptymessage">EmptyMessage</string>
+</resources>
