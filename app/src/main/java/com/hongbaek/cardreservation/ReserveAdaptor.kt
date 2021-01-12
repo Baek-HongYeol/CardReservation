@@ -12,41 +12,6 @@ import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.Exception
 
-class ReservationItem {
-    var userName : String? = null
-    var addedTime : String? = null
-    var uid : String? = null
-    lateinit var startTime : String
-    lateinit var endTime : String
-    var calStartTime:Calendar
-    var calEndTime:Calendar
-    init{
-        calStartTime = Calendar.getInstance()
-        calEndTime = Calendar.getInstance()
-        calEndTime.add(Calendar.HOUR_OF_DAY, 6)
-        timeConvertToString()
-    }
-    fun timeConvertToCalender():Boolean{
-        try {
-            val df = SimpleDateFormat("yyyy.MM.dd HH:mm", Locale.KOREA)
-            calStartTime = Calendar.getInstance()
-            calStartTime.time = df.parse(startTime) ?: calStartTime.time
-            calEndTime  = Calendar.getInstance()
-            calEndTime.time = df.parse(endTime) ?: calEndTime.time
-            return true
-        }catch (e:Exception){
-            Log.e("timeConvertToCalender", e.message?:"null")
-            e.printStackTrace()
-            return false
-        }
-    }
-    fun timeConvertToString():Boolean{
-        val df = SimpleDateFormat("yyyy.MM.dd HH:mm", Locale.KOREA)
-        startTime = df.format(calStartTime.time)
-        endTime = df.format(calEndTime.time)
-        return true
-    }
-}
 
 class ReserveHolder(itemView: View) : RecyclerView.ViewHolder(itemView){
 

@@ -11,11 +11,11 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        start<ReservationListActivity> {
+        start<CalendarActivity> {
             this.putExtra("cardID", cardID)
         }
         findViewById<Button>(R.id.button).setOnClickListener {
-            start<ReservationListActivity> {
+            start<CalendarActivity> {
             this.putExtra("cardID", cardID)
         }}
 

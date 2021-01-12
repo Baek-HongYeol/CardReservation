@@ -6,21 +6,23 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.google.firebase.database.*
 import com.google.firebase.database.ktx.getValue
+import com.prolificinteractive.materialcalendarview.CalendarDay
+import java.util.*
+import kotlin.collections.ArrayList
 
-class ReservationListViewModel(cardID:String) : ViewModel() {
-    class Factory(private val carID:String) : ViewModelProvider.Factory {
+
+class ReservationListViewModel(val cardID:String) : ViewModel() {
+    class Factory(private val _cardID:String) : ViewModelProvider.Factory {
         override fun <T : ViewModel?> create(modelClass: Class<T>): T {
-            Log.d("RLVM Factory-carID", "$carID")
-            return ReservationListViewModel(carID) as T
+            Log.d("RLVM Factory-carID", "$_cardID")
+            return ReservationListViewModel(_cardID) as T
         }
     }
     var reservationList: MutableLiveData<ArrayList<ReservationItem>> = MutableLiveData()
 
     private val database = FirebaseDatabase.getInstance()
-    private val ref by lazy{
-        database.getReference("Reservation/$cardID")
-    }
-    private val query: Query by lazy{ref.orderByChild("startTime")}
+    private var ref:DatabaseReference
+    private var query: Query
     private var isQueryAvailable:Boolean = false
     private val valueEventListener = object : ChildEventListener {
         private val TAG = "RealTimeDB/Reservation/$cardID"
@@ -37,7 +39,7 @@ class ReservationListViewModel(cardID:String) : ViewModel() {
                 val changed : ReservationItem? = dataSnapshot.getValue<ReservationItem>()
                 val list = reservationList.value!!
                 for(item in list){
-                    if(item.userName.equals(changed?.userName)){
+                    if(item.addedTime.equals(changed?.addedTime)){
                         Log.d("RLVM_onChildChanged", "found changed index")
                         val idx = list.indexOf(item)
                         Log.d("RLVM_onChildChanged-idx", idx.toString())
@@ -60,11 +62,17 @@ class ReservationListViewModel(cardID:String) : ViewModel() {
             Log.d("ReservationListVM", "onChildAdded-ID: " + (dataSnapshot.key?:"null"))
             val list = reservationList.value!!
             if (reservation != null) {
-                Log.d("ReservationListVM", "onChildAdded-name" + (reservation.userName?:"null"))
+                Log.d("ReservationListVM", "onChildAdded-name: " + (reservation.userName?:"null"))
                 reservation.addedTime = dataSnapshot.key
-                reservation.timeConvertToCalender()
-                list.add(reservation)
-                reservationList.postValue(list)
+                reservation.adaptTime()
+                Log.d("RLVM_onChildAdded", "selectedDay-${selectedDay.get(Calendar.YEAR)}_reserv-${reservation.calStartTime.get(Calendar.YEAR)}")
+                Log.d("RLVM_onChildAdded", "selectedDay-${selectedDay.get(Calendar.MONTH)}_reserv-${reservation.calStartTime.get(Calendar.MONTH)}")
+                Log.d("RLVM_onChildAdded", "selectedDay-${selectedDay.get(Calendar.DAY_OF_MONTH)}_reserv-${reservation.calStartTime.get(Calendar.DAY_OF_MONTH)}")
+                if((selectedDay.after(reservation.calStartTime)&&selectedDay.before(reservation.calEndTime)) || selectedDay == reservation.calStartTime || selectedDay ==  reservation.calEndTime) {
+                    list.add(reservation)
+                    Log.d("RLVM", "onChildAdded-added")
+                    reservationList.postValue(list)
+                }
             }
         }
 
@@ -83,12 +91,19 @@ class ReservationListViewModel(cardID:String) : ViewModel() {
         }
     }
 
+    private var isPassed: Boolean = false
+    private var currentDay: Calendar = Calendar.getInstance(TimeZone.getDefault(), Locale.KOREA)
+    private var selectedDay:Calendar = currentDay
+
     init{
         reservationList.value = ArrayList()
+        ref = database.getReference("Reservation/$cardID")
+        query = ref.orderByChild("startTime")
     }
     fun startQuery(){
         isQueryAvailable = try{
             query.addChildEventListener(valueEventListener)
+            Log.d("RLVM", "startQuery executed")
             true
         }catch (e:Exception){
             Log.e("ReservationListVM", "startQuery->"+e.message)
@@ -101,9 +116,34 @@ class ReservationListViewModel(cardID:String) : ViewModel() {
         if(isQueryAvailable) query.removeEventListener(valueEventListener)
         reservationList.value = ArrayList()
     }
+    private fun setQuery(isPassed:Boolean, startDay:String, endDay:String){
+        try {
+            ref = if (isPassed) database.getReference("Reservation/$cardID")
+            else database.getReference("Reservation/$cardID")
+            query = ref.orderByChild("startTime")
+                    .startAt(startDay, "startTime")
+                    .endAt(endDay, "startTime")
+        }catch(e:Exception){
+            Log.e("RLVM", "setQuery->"+e.message)
+            e.printStackTrace()
+            pushToast("데이터베이스 설정 실패")
+        }
+        Log.d("RLVM-setQuery", startDay)
+        Log.d("RLVM-setQuery", endDay)
+        this.isPassed = isPassed
+    }
     fun reload() {
         stopQuery()
         startQuery()
+    }
+    fun reload(day:CalendarDay){
+        var calday = CalendarDay.from(currentDay.get(Calendar.YEAR), currentDay.get(Calendar.MONTH)+1, currentDay.get(Calendar.DAY_OF_MONTH))
+        var ispassed = day.isBefore(calday)
+        selectedDay.set(day.year, day.month-1, day.day)
+        var queryStart = calendarDayToString(day, -3)
+        var queryEnd = calendarDayToString(day, 3)
+        setQuery(ispassed, queryStart, queryEnd)
+        reload()
     }
     fun getList():ArrayList<ReservationItem>{
         return reservationList.value!!
@@ -115,6 +155,20 @@ class ReservationListViewModel(cardID:String) : ViewModel() {
         else {
             Log.e("removeItem", "position index overflows list")
         }
+    }
+
+    private fun calendarDayToString(calDay:CalendarDay, day:Int=0):String{
+        var da = Calendar.getInstance()
+        da.set(calDay.year, calDay.month-1, calDay.day)
+        da.add(Calendar.DAY_OF_MONTH, day)
+        var queryString = "${da.get(Calendar.YEAR)}."
+        var num = da.get(Calendar.MONTH)+1
+        queryString += if(num<10) "0${num}."
+        else "${num}."
+        num = da.get(Calendar.DAY_OF_MONTH)
+        queryString += if(num<10) "0${num}"
+        else "$num"
+        return queryString
     }
 
     var toastMessage : SingleLiveEvent<String> = SingleLiveEvent()

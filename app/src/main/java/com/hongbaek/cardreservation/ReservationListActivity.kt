@@ -25,9 +25,7 @@ class ReservationListActivity : AppCompatActivity() {
     private lateinit var recyclerView: RecyclerView
     private lateinit var viewAdaptor: ReserveAdaptor
     private lateinit var viewManager : RecyclerView.LayoutManager
-    private lateinit var calendarView: RecyclerView
-    private lateinit var calendarViewManager: StaggeredGridLayoutManager
-    private lateinit var calendarViewAdaptor: CalendarAdaptor
+
 
     private lateinit var mEmptyListMessage : TextView
     private lateinit var cardID: String
@@ -45,11 +43,6 @@ class ReservationListActivity : AppCompatActivity() {
             }
             viewAdaptor.updateAdaptor(reservationList)
         })*/
-
-        calendarView = findViewById(R.id.calendarView_RV)
-        calendarViewManager = StaggeredGridLayoutManager(7, StaggeredGridLayoutManager.VERTICAL)
-        calendarViewAdaptor = CalendarAdaptor()
-
 
         /* mEmptyListMessage = findViewById(R.id.emptymessageView)
         recyclerView = findViewById(R.id.RV_reservation)
