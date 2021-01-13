@@ -4,11 +4,12 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.view.View
-import androidx.activity.viewModels
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+import com.hongbaek.cardreservation.utils.EventDecorator
 import com.hongbaek.cardreservation.utils.SundayDecorator
 import com.prolificinteractive.materialcalendarview.CalendarDay
 import com.prolificinteractive.materialcalendarview.MaterialCalendarView
@@ -23,6 +24,7 @@ class CalendarActivity : AppCompatActivity() {
     }
     private lateinit var calendarView: MaterialCalendarView
     private lateinit var recyclerView: RecyclerView
+    private lateinit var swipeRefreshLayout: SwipeRefreshLayout
     private lateinit var recyclerViewManager: RecyclerView.LayoutManager
     private val recyclerViewAdaptor: ReserveAdaptor by lazy{
         val adaptor = ReserveAdaptor(object : ReserveAdaptor.ItemEventListener{
@@ -53,9 +55,12 @@ class CalendarActivity : AppCompatActivity() {
         setContentView(R.layout.activity_calendar)
         calendarView = findViewById(R.id.calendarView)
         recyclerView = findViewById(R.id.reservationList_RV)
+        swipeRefreshLayout = findViewById(R.id.swipeRefreshLayout)
+
         calendarView.setDateSelected(CalendarDay.today(), true)
         val sundayDecorator = SundayDecorator(calendarView)
-        //calendarView.addDecorators(sundayDecorator)
+        calendarView.addDecorators(sundayDecorator)
+
         recyclerViewManager = LinearLayoutManager(this)
         viewModel.reservationList.observe(this, Observer { reservationList: List<ReservationItem>? ->
             if (reservationList == null) {
@@ -66,7 +71,13 @@ class CalendarActivity : AppCompatActivity() {
         recyclerViewAdaptor.updateAdaptor(viewModel.getList())
         recyclerView.adapter = recyclerViewAdaptor
         recyclerView.layoutManager = recyclerViewManager
-        
+        recyclerView.setHasFixedSize(true)
+
+        swipeRefreshLayout.setOnRefreshListener {
+            viewModel.reload()
+            swipeRefreshLayout.isRefreshing=false
+        }
+
         calendarView.setOnDateChangedListener { widget, date, selected ->
             if(selected) viewModel.reload(date)
         }

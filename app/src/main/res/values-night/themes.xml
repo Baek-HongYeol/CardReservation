@@ -2,10 +2,12 @@
     <!-- Base application theme. -->
     <style name="Theme.CardReservation" parent="Theme.MaterialComponents.DayNight.NoActionBar">
         <!-- Primary brand color. -->
-        <item name="colorPrimary">@color/colorPrimaryonDark</item>
+        <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryVariant">@color/black</item>
-        <item name="colorOnPrimary">@color/colorOnPrimaryonDark</item>
+        <item name="colorOnPrimary">@color/colorOnPrimary</item>
+        <item name="android:textColorPrimary">@color/white</item>
         <item name="backgroundColor">@color/gray1</item>
+        <item name="background">@color/gray1</item>
 
         <!-- Secondary brand color. -->
         <item name="colorSecondary">@color/teal_200</item>

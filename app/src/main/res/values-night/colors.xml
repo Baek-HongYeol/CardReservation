@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">@color/black</color>
+    <color name="colorOnPrimary">@color/white</color>
+    <color name="colorSecondary">@color/gray1</color>
+    <color name="backgroundColor">@color/gray1</color>
+
+    <color name="colorAccent">#03DAC5</color>
+    <color name="textColor">#FFFB771F</color>
+    <color name="colorIn">#FF348E1B</color>
+    <color name="colorOut">#FFFF4747</color>
+
+
+    <color name="dayTextColor">#717171</color>
+    <color name="selectedDayTextColor">#F1F1F1</color>
+    <color name="otherdayTextColor">#8F9F9F9F</color>
+    <color name="selectedDayBackColor">#177CCC</color>
+
+
+
+</resources>

@@ -1,10 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="colorPrimary">@color/white</color>
-    <color name="colorPrimaryonDark">@color/black</color>
     <color name="colorOnPrimary">@color/black</color>
-    <color name="colorOnPrimaryonDark">@color/white</color>
-    <color name="colorSecondary"></color>
+    <color name="colorSecondary">@color/white</color>
+    <color name="backgroundColor">@color/white</color>
 
     <color name="colorAccent">#03DAC5</color>
     <color name="textColor">#FFFB771F</color>

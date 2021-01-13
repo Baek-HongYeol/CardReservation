@@ -14,7 +14,7 @@ import kotlin.collections.ArrayList
 class ReservationListViewModel(val cardID:String) : ViewModel() {
     class Factory(private val _cardID:String) : ViewModelProvider.Factory {
         override fun <T : ViewModel?> create(modelClass: Class<T>): T {
-            Log.d("RLVM Factory-carID", "$_cardID")
+            Log.d("RLVM Factory-carID", _cardID)
             return ReservationListViewModel(_cardID) as T
         }
     }
@@ -57,20 +57,18 @@ class ReservationListViewModel(val cardID:String) : ViewModel() {
         }
 
         override fun onChildAdded(dataSnapshot: DataSnapshot, previousChildName: String?) {
-            Log.d("ReservationListVM", "onChildAdded-prevID: " + (previousChildName?:"null"))
+            val tag = "RLVM_onChildAdded"
+            Log.d(tag, "onChildAdded-prevID: " + (previousChildName?:"null"))
+            Log.d(tag, "onChildAdded-ID: " + (dataSnapshot.key?:"null"))
             val reservation: ReservationItem? = dataSnapshot.getValue<ReservationItem>()
-            Log.d("ReservationListVM", "onChildAdded-ID: " + (dataSnapshot.key?:"null"))
-            val list = reservationList.value!!
             if (reservation != null) {
-                Log.d("ReservationListVM", "onChildAdded-name: " + (reservation.userName?:"null"))
+                val list = reservationList.value!!
+                Log.d(tag, "onChildAdded-name: " + (reservation.userName?:"null"))
                 reservation.addedTime = dataSnapshot.key
                 reservation.adaptTime()
-                Log.d("RLVM_onChildAdded", "selectedDay-${selectedDay.get(Calendar.YEAR)}_reserv-${reservation.calStartTime.get(Calendar.YEAR)}")
-                Log.d("RLVM_onChildAdded", "selectedDay-${selectedDay.get(Calendar.MONTH)}_reserv-${reservation.calStartTime.get(Calendar.MONTH)}")
-                Log.d("RLVM_onChildAdded", "selectedDay-${selectedDay.get(Calendar.DAY_OF_MONTH)}_reserv-${reservation.calStartTime.get(Calendar.DAY_OF_MONTH)}")
-                if((selectedDay.after(reservation.calStartTime)&&selectedDay.before(reservation.calEndTime)) || selectedDay == reservation.calStartTime || selectedDay ==  reservation.calEndTime) {
+                if((selectedDay.after(reservation.calStartTime)&&selectedDay.before(reservation.calEndTime)) || isSameDay(selectedDay, reservation.calStartTime) || isSameDay(selectedDay, reservation.calEndTime)) {
                     list.add(reservation)
-                    Log.d("RLVM", "onChildAdded-added")
+                    Log.d(tag, "child-Added")
                     reservationList.postValue(list)
                 }
             }
@@ -139,7 +137,9 @@ class ReservationListViewModel(val cardID:String) : ViewModel() {
     fun reload(day:CalendarDay){
         var calday = CalendarDay.from(currentDay.get(Calendar.YEAR), currentDay.get(Calendar.MONTH)+1, currentDay.get(Calendar.DAY_OF_MONTH))
         var ispassed = day.isBefore(calday)
-        selectedDay.set(day.year, day.month-1, day.day)
+        selectedDay.set(day.year, day.month-1, day.day,0,0,0)
+        Log.d("RLVM_reload", "selectedDay.time:${selectedDay.time.time}")
+        Log.d("RLVM_reload", "selectedDay.time:${selectedDay.time}")
         var queryStart = calendarDayToString(day, -3)
         var queryEnd = calendarDayToString(day, 3)
         setQuery(ispassed, queryStart, queryEnd)
@@ -155,6 +155,11 @@ class ReservationListViewModel(val cardID:String) : ViewModel() {
         else {
             Log.e("removeItem", "position index overflows list")
         }
+    }
+    private fun isSameDay(a:Calendar, b:Calendar):Boolean{
+        return a.get(Calendar.YEAR) == b.get(Calendar.YEAR) &&
+                a.get(Calendar.MONTH) == b.get(Calendar.MONTH) &&
+                a.get(Calendar.DAY_OF_MONTH) == b.get(Calendar.DAY_OF_MONTH)
     }
 
     private fun calendarDayToString(calDay:CalendarDay, day:Int=0):String{

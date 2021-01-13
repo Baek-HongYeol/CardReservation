@@ -18,6 +18,7 @@ class ReserveHolder(itemView: View) : RecyclerView.ViewHolder(itemView){
     @SuppressLint("SetTextI18n")
     fun bind(item:ReservationItem){
         Log.d("RHolder_bind-name", item.userName?:"null")
+        Log.d("RHolder_bind-period", item.startTime +" ~ " + item.endTime)
         itemView.findViewById<TextView>(R.id.userName).text = item.userName
         itemView.findViewById<TextView>(R.id.periodTextView).text = item.startTime + " ~ " + item.endTime
     }
@@ -42,7 +43,8 @@ class ReserveAdaptor(private val itemEventListener:ItemEventListener): RecyclerV
     }
 
     override fun onBindViewHolder(holder: ReserveHolder, position: Int) {
-        Log.d("RA_onBindViewHolderpos", position.toString())
+        val tag = "RA_onBindViewHolder"
+        Log.d(tag, "pos: $position")
         Log.d("RA_observe_list", list.size.toString())
         Log.d("RA_observe_list_Name", list[0].userName?:"null")
         holder.bind(list[position])

@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="#0D7E7E7E"
-    app:cardBackgroundColor="#FFFFFF"
+    app:cardBackgroundColor="@color/backgroundColor"
     app:cardCornerRadius="5dp"
     app:cardUseCompatPadding="true">
 
@@ -38,7 +38,7 @@
             android:layout_alignTop="@id/userName"
             android:layout_alignParentEnd="true"
             android:layout_centerInParent="true"
-            android:layout_toEndOf="@id/userName"
+            android:layout_toRightOf="@id/userName"
             android:background="#00FFFFFF"
             android:gravity="right"
             android:textAppearance="?android:attr/textAppearanceListItem"

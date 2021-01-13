@@ -16,42 +16,36 @@ class ReservationItem {
     var calEndTime: Calendar
     lateinit var calDayStart:CalendarDay
     lateinit var calDayEnd: CalendarDay
-    var tempTime: Timestamp = Timestamp(1610436974000)
+    var tempTime: Timestamp = Timestamp(1610540083000)
     init{
         var c = Calendar.getInstance()
         c.time = Date(tempTime.time)
-        Log.d("Timestamp TEST", "Timestamp:  ${c.toString()}")
         calStartTime = Calendar.getInstance()
-        Log.d("Timestamp TEST", "startTimestamp: ${calStartTime.time}")
         calEndTime = Calendar.getInstance()
-        calEndTime.add(Calendar.HOUR_OF_DAY, 6)
+        calStartTime.timeInMillis=0
+        calEndTime.timeInMillis=0
         timeConvertToString()
     }
     fun adaptTime(){
-        timeConvertToCalender()
+        timeConvertToCalendar()
         timeConvertToString()
     }
 
-    fun timeConvertToCalender():Boolean{
+    fun timeConvertToCalendar():Boolean{
         try {
             val df = SimpleDateFormat("yyyy.MM.dd HH:mm", Locale.KOREA)
-            calStartTime = Calendar.getInstance()
             calStartTime.time = df.parse(startTime) ?: calStartTime.time
-            calEndTime  = Calendar.getInstance()
+            Log.d("ReservationItem", "timeToCalendar-startTime_$startTime")
+            Log.d("ReservationItem", "timeToCalendar-carStartTime_${calStartTime.get(Calendar.DAY_OF_MONTH)}")
             calEndTime.time = df.parse(endTime) ?: calEndTime.time
-            calendarToCalendarDay()
+            Log.d("ReservationItem", "timeToCalendar-endTime_$endTime")
+            Log.d("ReservationItem", "timeToCalendar-carEndTime_${calEndTime.get(Calendar.DAY_OF_MONTH)}")
             return true
         }catch (e:Exception){
             Log.e("timeConvertToCalender", e.message?:"null")
             e.printStackTrace()
             return false
         }
-    }
-    fun calendarToCalendarDay(){
-        calDayStart = CalendarDay.from(calStartTime.get(Calendar.YEAR), calStartTime.get(Calendar.MONTH), calStartTime.get(Calendar.DAY_OF_MONTH))
-        calDayEnd = CalendarDay.from(calEndTime.get(Calendar.YEAR), calEndTime.get(Calendar.MONTH), calEndTime.get(Calendar.DAY_OF_MONTH))
-    }
-    fun calendarDayToCalendar(){
     }
     fun timeConvertToString():Boolean{
         val df = SimpleDateFormat("yyyy.MM.dd HH:mm", Locale.KOREA)
