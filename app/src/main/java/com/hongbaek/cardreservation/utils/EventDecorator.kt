@@ -26,7 +26,7 @@ class EventDecorator(color: Int, dates: Collection<CalendarDay>?, context: Activ
 
     override fun decorate(view: DayViewFacade) {
         view.setSelectionDrawable(drawable)
-        view.addSpan(DotSpan(5F, color)); // 날자밑에 점
+        view.addSpan(DotSpan(5F, color)); // 날짜 밑에 점
     }
 
 }

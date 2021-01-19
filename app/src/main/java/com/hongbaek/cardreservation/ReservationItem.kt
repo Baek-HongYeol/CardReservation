@@ -14,8 +14,6 @@ class ReservationItem {
     lateinit var endTime : String
     var calStartTime: Calendar
     var calEndTime: Calendar
-    lateinit var calDayStart:CalendarDay
-    lateinit var calDayEnd: CalendarDay
     var tempTime: Timestamp = Timestamp(1610540083000)
     init{
         var c = Calendar.getInstance()

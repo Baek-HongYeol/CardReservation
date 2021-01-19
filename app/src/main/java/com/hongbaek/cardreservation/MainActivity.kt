@@ -6,7 +6,7 @@ import android.widget.Button
 import splitties.activities.start
 
 class MainActivity : AppCompatActivity() {
-    val cardID = "01"
+    val cardID = "Card"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

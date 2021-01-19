@@ -9,4 +9,6 @@
     <string name="thursday">목</string>
     <string name="friday">금</string>
     <string name="saturday">토</string>
+    <string name="addReservation">일정 추가</string>
+    <string name="schedule_title">용도</string>
 </resources>

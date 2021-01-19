@@ -14,7 +14,7 @@ import kotlin.collections.ArrayList
 class ReservationListViewModel(val cardID:String) : ViewModel() {
     class Factory(private val _cardID:String) : ViewModelProvider.Factory {
         override fun <T : ViewModel?> create(modelClass: Class<T>): T {
-            Log.d("RLVM Factory-carID", _cardID)
+            Log.d("RLVM Factory-cardID", _cardID)
             return ReservationListViewModel(_cardID) as T
         }
     }
@@ -39,7 +39,7 @@ class ReservationListViewModel(val cardID:String) : ViewModel() {
                 val changed : ReservationItem? = dataSnapshot.getValue<ReservationItem>()
                 val list = reservationList.value!!
                 for(item in list){
-                    if(item.addedTime.equals(changed?.addedTime)){
+                    if(item.addedTime == changed?.addedTime){
                         Log.d("RLVM_onChildChanged", "found changed index")
                         val idx = list.indexOf(item)
                         Log.d("RLVM_onChildChanged-idx", idx.toString())
@@ -77,14 +77,16 @@ class ReservationListViewModel(val cardID:String) : ViewModel() {
         override fun onChildRemoved(dataSnapshot: DataSnapshot) {
             val reservation: ReservationItem? = dataSnapshot.getValue<ReservationItem>()
             val addedTime = dataSnapshot.key
-            Log.d("ReservationListVM", "onChildRemoved-Key " + (addedTime?:"null"))
+            Log.d("ReservationListVM", "onChildRemoved-Key $addedTime")
             Log.d("ReservationListVM", "onChildRemoved-Name " + (reservation?.userName?:"null"))
-            val pos = addedTime?.toInt()?.minus(1)//list.indexOf(reservation)
-
+            reservation?.addedTime = addedTime
+            reservation?.adaptTime()
             val list = reservationList.value!!
-            Log.d("ReservationListVM", "onChildRemoved-idx " + pos.toString())
-            pos?.let {
-                list.removeAt(it)
+            val pos = list.indexOf(reservation)
+
+            Log.d("ReservationListVM", "onChildRemoved-idx $pos")
+            if(pos>=0) {
+                list.removeAt(pos)
             }
         }
     }
@@ -151,7 +153,7 @@ class ReservationListViewModel(val cardID:String) : ViewModel() {
 
     fun removeItem(position: Int) {
         TODO("Authorization will be needed")
-        if (position < reservationList.value?.size ?: 0) reservationList.value?.get(position)?.addedTime?.let { ref.child(it).removeValue() }
+        if (position < reservationList.value?.size ?: 0) reservationList.value?.get(position)?.addedTime?.let { ref.child(it.toString()).removeValue() }
         else {
             Log.e("removeItem", "position index overflows list")
         }

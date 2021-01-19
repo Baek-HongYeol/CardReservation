@@ -3,7 +3,8 @@
     <color name="colorPrimary">@color/black</color>
     <color name="colorOnPrimary">@color/white</color>
     <color name="colorSecondary">@color/gray1</color>
-    <color name="backgroundColor">@color/gray1</color>
+    <color name="backgroundColor">@color/gray3</color>
+    <color name="panelBackgroundColor">@color/gray2</color>
 
     <color name="colorAccent">#03DAC5</color>
     <color name="textColor">#FFFB771F</color>

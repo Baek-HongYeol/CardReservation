@@ -1,57 +1,97 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true"
+    tools:context=".ReservationListActivity">
 
-    <LinearLayout
-        android:id="@+id/calendarLL"
+    <com.sothree.slidinguppanel.SlidingUpPanelLayout
+        android:id="@+id/slidingUpPanel"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:orientation="vertical"
-        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_height="match_parent"
+        android:background="@color/colorPrimary"
+        android:gravity="bottom"
+        android:fitsSystemWindows="true"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toTopOf="parent"
+        app:umanoDragView="@id/linearlayoutSRL"
+        app:umanoOverlay="false"
+        app:umanoPanelHeight="200dp"
+        app:umanoParallaxOffset="0dp"
+        app:umanoScrollableView="@id/reservationList_RV"
+        app:umanoShadowHeight="5dp">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/calendarLL"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintEnd_toStartOf="@+id/calendarView"
+            app:layout_constraintStart_toStartOf="@+id/calendarView">
+
+            <com.prolificinteractive.materialcalendarview.MaterialCalendarView
+                android:id="@+id/calendarView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@color/gray2"
+                android:focusable="auto"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:mcv_arrowColor="@color/colorOnPrimary"
+                app:mcv_dateTextAppearance="@style/CustomTextAppearance"
+                app:mcv_selectionColor="@color/selectedDayBackColor"
+                app:mcv_showOtherDates="all" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
         <LinearLayout
+            android:id="@+id/linearlayoutSRL"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"/>
+            android:layout_height="400dp"
+            android:background="@color/gray2"
+            android:orientation="vertical">
 
-        <com.prolificinteractive.materialcalendarview.MaterialCalendarView
-            android:id="@+id/calendarView"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:padding="5dp"
-            app:mcv_arrowColor="@color/colorOnPrimary"
-            app:mcv_dateTextAppearance="@style/CustomTextAppearance"
-            app:mcv_selectionColor="@color/selectedDayBackColor"
-            app:mcv_showOtherDates="all" />
+            <View
+                android:id="@+id/swipebar"
+                android:layout_width="60dp"
+                android:layout_height="9dp"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="10dp"
+                android:layout_marginBottom="10dp"
+                android:background="@drawable/ic_baseline_drag_handle_24" />
 
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_marginTop="10dp"
-        android:orientation="vertical"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/calendarLL">
-        <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-            android:id="@+id/swipeRefreshLayout"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
-
-
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/reservationList_RV"
+            <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+                android:id="@+id/swipeRefreshLayout"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent" />
+                android:layout_height="match_parent">
 
-        </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
-    </LinearLayout>
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/reservationList_RV"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:clipChildren="false"
+                    android:clipToPadding="false" />
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+
+            </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+
+
+        </LinearLayout>
+
+    </com.sothree.slidinguppanel.SlidingUpPanelLayout>
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fab_reservation_add"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:contentDescription="@string/addReservation"
+        app:fabSize="normal"
+        app:layout_anchor="@id/swipeRefreshLayout"
+        app:layout_anchorGravity="bottom|end"
+        app:srcCompat="@android:drawable/ic_input_add" />
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>
