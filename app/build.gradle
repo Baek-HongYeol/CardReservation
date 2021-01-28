@@ -22,6 +22,15 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            manifestPlaceholders = [
+                    appName : "@string/app_name"
+            ]
+        }
+        debug {
+            applicationIdSuffix '.dev'
+            manifestPlaceholders = [
+                    appName : "@string/app_name_dev"
+            ]
         }
     }
     compileOptions {
@@ -50,10 +59,12 @@ dependencies {
 
     implementation platform('com.google.firebase:firebase-bom:26.2.0')
     implementation 'com.firebaseui:firebase-ui-database:6.3.0'
-    implementation 'com.google.firebase:firebase-database-ktx:19.6.0'
+    implementation 'com.google.firebase:firebase-database-ktx'
+    implementation 'com.google.firebase:firebase-functions-ktx'
 
     implementation("com.louiscad.splitties:splitties-activities:$splitties_version")
     implementation("com.louiscad.splitties:splitties-toast:$splitties_version")
+    implementation("com.louiscad.splitties:splitties-alertdialog:$splitties_version")
 
     testImplementation 'junit:junit:4.+'
     androidTestImplementation 'androidx.test.ext:junit:1.1.2'

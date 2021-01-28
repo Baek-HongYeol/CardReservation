@@ -1,5 +1,6 @@
 <resources>
     <string name="app_name">CardReservation</string>
+    <string name="app_name_dev">CardReservation Test</string>
     <string name="ok">확인</string>
     <string name="resEmptymessage">EmptyMessage</string>
     <string name="sunday">일</string>
@@ -11,4 +12,15 @@
     <string name="saturday">토</string>
     <string name="addReservation">일정 추가</string>
     <string name="schedule_title">용도</string>
+    <string name="start">시작</string>
+    <string name="end">종료</string>
+    <string name="slashFormattedDate">%1$d/%2$d/%3$d</string>
+    <string name="formattedTime">%1$s:%2$s</string>
+    <string name="estimated_money">예상 사용 금액</string>
+    <string name="return_">반납하기</string>
+    <string name="used_money">사용한 금액</string>
+    <string name="user">사용자</string>
+    <string name="cancel">취소</string>
+    <string name="reserve">예약</string>
+    <string name="password">수정용 비밀번호</string>
 </resources>

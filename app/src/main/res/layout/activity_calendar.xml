@@ -88,6 +88,8 @@
         android:id="@+id/fab_reservation_add"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginEnd="10dp"
+        android:layout_marginBottom="10dp"
         android:contentDescription="@string/addReservation"
         app:fabSize="normal"
         app:layout_anchor="@id/swipeRefreshLayout"

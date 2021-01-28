@@ -1,0 +1,301 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/backgroundColor">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/panel_schedule"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/bg_rounded_custom"
+        android:backgroundTint="@color/panelBackgroundColor"
+        app:layout_constraintCircleRadius="10dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/titleTIL"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="15dp"
+            android:layout_marginEnd="10dp"
+            android:textColorHint="@color/gray"
+            app:boxBackgroundColor="@color/panelBackgroundColor"
+            app:hintAnimationEnabled="false"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/titleIET"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/schedule_title"
+                android:textColor="@color/colorOnPrimary"
+                android:textSize="25sp" />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <LinearLayout
+            android:id="@+id/startTimeLL"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="20dp"
+            android:layout_marginEnd="10dp"
+            android:clickable="true"
+            android:focusable="true"
+            android:orientation="vertical"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/titleTIL">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <TextView
+                    android:id="@+id/startTV"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="10dp"
+                    android:text="@string/start"
+                    android:textSize="21sp"
+                    app:layout_constraintBaseline_toBaselineOf="@+id/startDayTV"
+                    app:layout_constraintStart_toStartOf="parent" />
+
+                <TextView
+                    android:id="@+id/startDayTV"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="8dp"
+                    android:text="2021/01/01"
+                    android:textSize="21sp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toStartOf="@id/startTimeTV" />
+
+                <TextView
+                    android:id="@+id/startTimeTV"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="16:20"
+                    android:textSize="21sp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <LinearLayout
+                android:id="@+id/startPickerLayout"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:visibility="gone"
+                tools:visibility="visible">
+
+                <DatePicker
+
+                    android:id="@+id/startDatePicker"
+
+                    android:layout_width="wrap_content"
+
+                    android:layout_height="wrap_content"
+
+                    android:calendarViewShown="false"
+                    android:datePickerMode="spinner" />
+
+                <com.hongbaek.cardreservation.CustomTimePicker
+                    android:id="@+id/startTimePicker"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:clipToPadding="false"
+                    android:timePickerMode="spinner">
+
+                </com.hongbaek.cardreservation.CustomTimePicker>
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/endTimeLL"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="15dp"
+            android:layout_marginEnd="10dp"
+            android:layout_marginBottom="20dp"
+            android:clickable="true"
+            android:focusable="true"
+            android:orientation="vertical"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/startTimeLL">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <TextView
+                    android:id="@+id/endTV"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="10dp"
+                    android:text="@string/end"
+                    android:textSize="21sp"
+                    app:layout_constraintBaseline_toBaselineOf="@+id/endDayTV"
+                    app:layout_constraintStart_toStartOf="parent" />
+
+                <TextView
+                    android:id="@+id/endDayTV"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="8dp"
+                    android:text="2021/01/01"
+                    android:textSize="21sp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toStartOf="@id/endTimeTV" />
+
+                <TextView
+                    android:id="@+id/endTimeTV"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="16:55"
+                    android:textSize="21sp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <LinearLayout
+                android:id="@+id/endPickerLayout"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:visibility="gone">
+
+                <DatePicker
+
+                    android:id="@+id/endDatePicker"
+
+                    android:layout_width="wrap_content"
+
+                    android:layout_height="wrap_content"
+
+                    android:layout_gravity="center"
+
+                    android:calendarViewShown="false"
+                    android:datePickerMode="spinner" />
+
+                <com.hongbaek.cardreservation.CustomTimePicker
+                    android:id="@+id/endTimePicker"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:timePickerMode="spinner">
+
+                </com.hongbaek.cardreservation.CustomTimePicker>
+            </LinearLayout>
+
+        </LinearLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/panel_details"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:background="@drawable/bg_rounded_custom"
+        android:backgroundTint="@color/panelBackgroundColor"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/panel_schedule">
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/estimateTIL"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginEnd="10dp"
+            android:textColorHint="@color/gray"
+            app:boxBackgroundColor="@color/panelBackgroundColor"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/estimateIET"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/estimated_money"
+                android:inputType="number"
+                android:textSize="17sp" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/passwordTIL"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginEnd="10dp"
+            android:layout_marginBottom="20dp"
+            android:textColorHint="@color/gray"
+            app:boxBackgroundColor="@color/panelBackgroundColor"
+            app:endIconMode="password_toggle"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/estimateTIL">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/passwordIET"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/password"
+                android:inputType="textPassword"
+                android:textSize="17sp" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginStart="15dp"
+        android:layout_marginEnd="15dp"
+        android:orientation="horizontal"
+        android:padding="3dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
+
+        <Button
+            android:id="@+id/cancelButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:paddingTop="9dp"
+            android:paddingBottom="9dp"
+            android:text="@string/cancel"
+            android:textSize="16sp"
+            app:cornerRadius="15dp" />
+
+        <Button
+            android:id="@+id/reserveButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:paddingTop="9dp"
+            android:paddingBottom="9dp"
+            android:text="@string/reserve"
+            android:textSize="16sp"
+            app:cornerRadius="15dp" />
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

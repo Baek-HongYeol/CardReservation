@@ -2,12 +2,14 @@ package com.hongbaek.cardreservation
 
 import androidx.appcompat.app.AppCompatActivity
 import android.graphics.Rect
+import android.graphics.drawable.ColorDrawable
+import android.os.Build
 import android.os.Bundle
-import android.provider.Settings
 import android.util.Log
 import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -22,6 +24,7 @@ import com.prolificinteractive.materialcalendarview.MaterialCalendarView
 import com.sothree.slidinguppanel.SlidingUpPanelLayout
 import com.sothree.slidinguppanel.SlidingUpPanelLayout.*
 import splitties.toast.toast
+import splitties.activities.start
 
 class CalendarActivity : AppCompatActivity() {
     private val viewModel: ReservationListViewModel  by lazy{
@@ -38,7 +41,12 @@ class CalendarActivity : AppCompatActivity() {
     private lateinit var fab_add: FloatingActionButton
     private var clickListener: View.OnClickListener = View.OnClickListener {
         Log.d("clickListener", "'executed")
-        //ScheduleCreateDialog(this)
+        var day = calendarView.selectedDate!!
+        start<ScheduleCreateActivity>{
+            putExtra("sYear", day.year)
+            putExtra("sMonth", day.month)
+            putExtra("sDate", day.day)
+        }
     }
 
     private val recyclerViewAdaptor: ReserveAdaptor by lazy{
@@ -100,7 +108,7 @@ class CalendarActivity : AppCompatActivity() {
             if(slidingUPL.panelState == PanelState.EXPANDED) slidingUPL.panelState = PanelState.COLLAPSED
         }
         val header =calendarView.findViewById<LinearLayout>(R.id.header)
-        header.setBackgroundColor(resources.getColor(R.color.colorPrimary, theme))
+        header.setBackgroundColor(ContextCompat.getColor(header.context, R.color.colorPrimary))
         val param = header.layoutParams as ViewGroup.MarginLayoutParams
         param.setMargins(0, 0, 0, 10)
         param.width = LinearLayout.LayoutParams.MATCH_PARENT
@@ -117,13 +125,10 @@ class CalendarActivity : AppCompatActivity() {
                 Log.d("SUPL_onPanelStateChange", "previousState: $previousState")
                 Log.d("SUPL_onPanelStateChange", "newState: $newState")
                 if(newState == PanelState.EXPANDED){
-                    fab_add = findViewById<FloatingActionButton>(R.id.fab_reservation_add)
                     fab_add.show()
-
-                    //fab_add.setOnClickListener(clickListener)
                 }
                 else if(newState == PanelState.DRAGGING){
-                    findViewById<FloatingActionButton>(R.id.fab_reservation_add).hide()
+                    fab_add.hide()
                 }
             }
         })
