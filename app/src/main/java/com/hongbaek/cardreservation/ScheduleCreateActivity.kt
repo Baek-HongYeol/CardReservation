@@ -171,7 +171,7 @@ class ScheduleCreateActivity : AppCompatActivity(){
             progressBarActivity.window!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT));
             progressBarActivity.show()
 
-            reserveSchedule(titleEIT.text.toString(), estimatedIET.text.toString(), passwordIET.text.toString())
+            reserveSchedule(titleEIT.text.toString(), userName = "Anonymous", estimatedIET.text.toString(), passwordIET.text.toString())
                     .addOnCompleteListener(OnCompleteListener { task ->
                         if (!task.isSuccessful) {
                             val e = task.exception
@@ -264,12 +264,13 @@ class ScheduleCreateActivity : AppCompatActivity(){
             view.visibility = View.GONE
     }
 
-    fun reserveSchedule(title: String, estimated:String, password:String): Task<Any?> {
+    fun reserveSchedule(title: String, userName: String, estimated:String, password:String): Task<Any?> {
 
             var startString = calendarToString(startDay)
             var endString = calendarToString(endDay)
             val data = hashMapOf(
                     "title" to title,
+                    "userName" to userName,
                     "startTime" to startString,
                     "endTime" to endString,
                     "password" to password,
