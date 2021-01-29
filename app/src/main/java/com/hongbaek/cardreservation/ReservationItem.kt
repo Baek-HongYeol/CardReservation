@@ -8,8 +8,10 @@ import java.util.*
 
 class ReservationItem {
     var userName : String? = null
+    var title : String? = null
     var addedTime : String? = null
     var uid : String? = null
+    var estimated: Int = 0
     lateinit var startTime : String
     lateinit var endTime : String
     var calStartTime: Calendar

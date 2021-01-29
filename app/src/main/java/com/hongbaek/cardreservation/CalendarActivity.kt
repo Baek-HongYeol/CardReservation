@@ -2,8 +2,6 @@ package com.hongbaek.cardreservation
 
 import androidx.appcompat.app.AppCompatActivity
 import android.graphics.Rect
-import android.graphics.drawable.ColorDrawable
-import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.View
@@ -16,7 +14,6 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.ItemDecoration
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-import com.hongbaek.cardreservation.utils.EventDecorator
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.hongbaek.cardreservation.utils.SundayDecorator
 import com.prolificinteractive.materialcalendarview.CalendarDay
@@ -25,8 +22,13 @@ import com.sothree.slidinguppanel.SlidingUpPanelLayout
 import com.sothree.slidinguppanel.SlidingUpPanelLayout.*
 import splitties.toast.toast
 import splitties.activities.start
+import splitties.alertdialog.alertDialog
+import splitties.alertdialog.message
+import splitties.alertdialog.okButton
+import splitties.alertdialog.title
 
 class CalendarActivity : AppCompatActivity() {
+    private val TAG = "Calendar_A"
     private val viewModel: ReservationListViewModel  by lazy{
         ViewModelProvider(this, ReservationListViewModel.Factory(cardID)).get(ReservationListViewModel::class.java)
     }
@@ -39,8 +41,8 @@ class CalendarActivity : AppCompatActivity() {
     private lateinit var recyclerViewManager: RecyclerView.LayoutManager
     private lateinit var slidingUPL: SlidingUpPanelLayout
     private lateinit var fab_add: FloatingActionButton
-    private var clickListener: View.OnClickListener = View.OnClickListener {
-        Log.d("clickListener", "'executed")
+    private var fabClickListener: View.OnClickListener = View.OnClickListener {
+        Log.d("fabClickListener", "'executed")
         var day = calendarView.selectedDate!!
         start<ScheduleCreateActivity>{
             putExtra("sYear", day.year)
@@ -52,7 +54,11 @@ class CalendarActivity : AppCompatActivity() {
     private val recyclerViewAdaptor: ReserveAdaptor by lazy{
         val adaptor = ReserveAdaptor(object : ReserveAdaptor.ItemEventListener{
             override fun onClick(v: View, position: Int) {
-
+                alertDialog {
+                    title = viewModel.getList()[position].title
+                    message = viewModel.getItemDetail(position)
+                    okButton()
+                }.show()
             }
 
             override fun onLongClick(v: View, position: Int): Boolean {
@@ -62,12 +68,12 @@ class CalendarActivity : AppCompatActivity() {
         adaptor.registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver() {
             override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
                 super.onItemRangeInserted(positionStart, itemCount)
-                Log.d("RLA_onItemRangeInserted", "executed")
+                Log.d("$TAG/SUP_L", "onItemRangeInserted: executed")
             }
 
             override fun onItemRangeRemoved(positionStart: Int, itemCount: Int) {
                 super.onItemRangeRemoved(positionStart, itemCount)
-                Log.d("RLA_onItemRangeRemoved", "executed")
+                Log.d("$TAG/SUP_L", "onItemRangeRemoved: executed")
             }
         })
         adaptor
@@ -122,8 +128,8 @@ class CalendarActivity : AppCompatActivity() {
                 previousState: PanelState?,
                 newState: PanelState?
             ) {
-                Log.d("SUPL_onPanelStateChange", "previousState: $previousState")
-                Log.d("SUPL_onPanelStateChange", "newState: $newState")
+                Log.d("$TAG/SUP_L", "onPanelStateChange: previousState: $previousState")
+                Log.d("$TAG/SUP_L", "onPanelStateChange: newState: $newState")
                 if(newState == PanelState.EXPANDED){
                     fab_add.show()
                 }
@@ -132,9 +138,9 @@ class CalendarActivity : AppCompatActivity() {
                 }
             }
         })
-
+        slidingUPL.panelState = PanelState.COLLAPSED
         fab_add.hide()
-        fab_add.setOnClickListener( clickListener )
+        fab_add.setOnClickListener( fabClickListener )
 
         viewModel.toastMessage.observe(this, Observer { res ->
             if (res != null) {

@@ -57,8 +57,7 @@ dependencies {
     implementation 'com.github.prolificinteractive:material-calendarview:2.0.0'
     implementation 'com.sothree.slidinguppanel:library:3.4.0'
 
-    implementation platform('com.google.firebase:firebase-bom:26.2.0')
-    implementation 'com.firebaseui:firebase-ui-database:6.3.0'
+    implementation platform('com.google.firebase:firebase-bom:26.3.0')
     implementation 'com.google.firebase:firebase-database-ktx'
     implementation 'com.google.firebase:firebase-functions-ktx'
 

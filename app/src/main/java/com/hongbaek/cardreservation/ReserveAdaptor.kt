@@ -8,9 +8,7 @@ import android.widget.TextView
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.hongbaek.cardreservation.utils.ReservationDiffUtilCallback
-import java.text.SimpleDateFormat
 import java.util.*
-import kotlin.Exception
 
 
 class ReserveHolder(itemView: View) : RecyclerView.ViewHolder(itemView){
@@ -19,7 +17,7 @@ class ReserveHolder(itemView: View) : RecyclerView.ViewHolder(itemView){
     fun bind(item:ReservationItem){
         Log.d("RHolder_bind-name", item.userName?:"null")
         Log.d("RHolder_bind-period", item.startTime +" ~ " + item.endTime)
-        itemView.findViewById<TextView>(R.id.userName).text = item.userName
+        itemView.findViewById<TextView>(R.id.itemTitleTV).text = item.title
         itemView.findViewById<TextView>(R.id.periodTextView).text = item.startTime + " ~ " + item.endTime
     }
 

@@ -1,5 +1,7 @@
 package com.hongbaek.cardreservation
 
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.util.Log
 import android.view.View
@@ -10,22 +12,22 @@ import com.google.android.gms.tasks.Task
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
 import com.google.firebase.functions.FirebaseFunctions
+import com.google.firebase.functions.HttpsCallableResult
 import com.google.firebase.functions.ktx.functions
 import com.google.firebase.ktx.Firebase
 import com.hongbaek.cardreservation.R.layout
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import org.json.JSONObject
 import splitties.alertdialog.alertDialog
 import splitties.alertdialog.message
 import splitties.alertdialog.okButton
 import splitties.alertdialog.title
 import splitties.toast.toast
+import java.lang.ClassCastException
 import java.util.*
+import kotlin.collections.HashMap
 
 class ScheduleCreateActivity : AppCompatActivity(){
+    private val TAG = "ScheduleCreate_A"
+
     private lateinit var textInputLayout: TextInputLayout
     private lateinit var startTimeLL: LinearLayout
     private lateinit var endTimeLL: LinearLayout
@@ -55,7 +57,7 @@ class ScheduleCreateActivity : AppCompatActivity(){
             R.id.startDatePicker -> {
                 startDay.set(year, month, day)
                 startDateTV.text = getString(R.string.slashFormattedDate, year, month+1, day)
-                Log.d("SCreateA_", "onDateChangedListener: TV.text: ${startDateTV.text}")
+                Log.d(TAG, "onDateChangedListener: TV.text: ${startDateTV.text}")
             }
             R.id.endDatePicker -> {
                 endDay.set(year, month, day)
@@ -64,8 +66,8 @@ class ScheduleCreateActivity : AppCompatActivity(){
             else -> throw Exception("invalid picker id exception")
         }
         var isStart = view.id == R.id.startDatePicker
-        Log.d("SCreateA_", "onDateChangedListener: isStartDate_ $isStart")
-        Log.d("SCreateA_", "onDateChangedListener: $year.${month+1}.$day")
+        Log.d(TAG, "onDateChangedListener: isStartDate_ $isStart")
+        Log.d(TAG, "onDateChangedListener: $year.${month+1}.$day")
     }
     private var onTimeChangedListener = TimePicker.OnTimeChangedListener { view, hourOfDay, minute ->
         when (view.id) {
@@ -77,6 +79,7 @@ class ScheduleCreateActivity : AppCompatActivity(){
                 var hourT = ""
                 hourT = if(hourOfDay<10) "0${hourOfDay}" else "$hourOfDay"
                 minuteT = if(minuteValue<10) "0$minuteValue" else "$minuteValue"
+                Log.d(TAG, "onTimeChangedListener: hour/minute: $hourT/$minuteT")
                 startTimeTV.text = getString(R.string.formattedTime, hourT, minuteT)
             }
             R.id.endTimePicker -> {
@@ -87,17 +90,18 @@ class ScheduleCreateActivity : AppCompatActivity(){
                 var hourT = ""
                 hourT = if(hourOfDay<10) "0${hourOfDay}" else "$hourOfDay"
                 minuteT = if(minuteValue<10) "0$minuteValue" else "$minuteValue"
-                Log.d("SCreateA_", "onTimeChangedListener: hour/minute: "+hourT+ minuteT)
+                Log.d(TAG, "onTimeChangedListener: hour/minute: $hourT/$minuteT")
                 endTimeTV.text = getString(R.string.formattedTime, hourT, minuteT)
             }
             else -> throw Exception("invalid picker id exception")
         }
         var isStart = view.id == R.id.startTimePicker
-        Log.d("SCreateA_", "onTimeChangedListener: isStartTime_ $isStart")
-        Log.d("SCreateA_", "onTimeChangedListener: $hourOfDay/${(view as CustomTimePicker).getDisplayedMinutes()}")
+        Log.d(TAG, "onTimeChangedListener: isStartTime_ $isStart")
     }
 
-    private lateinit var functions: FirebaseFunctions
+    private val functions: FirebaseFunctions by lazy{
+        Firebase.functions
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -163,45 +167,87 @@ class ScheduleCreateActivity : AppCompatActivity(){
                 toast("$msg 칸이 비었습니다.")
                 return@setOnClickListener
             }
-            var progressBar: ProgressBar = ProgressBar(this@ScheduleCreateActivity)
-            progressBar.isIndeterminate = true
-            progressBar.visibility = View.VISIBLE
+            val progressBarActivity = ProgressBarActivity(this)
+            progressBarActivity.window!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT));
+            progressBarActivity.show()
+
             reserveSchedule(titleEIT.text.toString(), estimatedIET.text.toString(), passwordIET.text.toString())
                     .addOnCompleteListener(OnCompleteListener { task ->
                         if (!task.isSuccessful) {
                             val e = task.exception
-                            Log.w("ScheduleCreateActivity", "reserveSchedule:onFailure", e)
-                            progressBar.visibility = View.GONE
+                            Log.w(TAG, "reserveSchedule:onFailure", e)
+                            progressBarActivity.dismiss()
                             toast("An error occurred.")
                             return@OnCompleteListener
                         }
-                        Log.d("reserveSchedule", "receive data, task.result: " + task.result)
-                        toast("Reservation Succesful")
+                        Log.d(TAG, "reserveSchedule: receive data, task.result: " + task.result)
                         var msg1 = ""
                         var msg2 = ""
-                        if (task.result?.get("message") != null) {
-                            msg1 = "예약 성공"
-                            msg2 = "정상적으로 등록되었습니다."
-                        } else {
-                            msg1 = "예약 실패"
-                            if (task.isComplete)
-                                msg2 = "예약이 거부되었습니다."
-                            else
-                                msg2 = "에러가 발생하였습니다. (검토 필요)"
-                            msg2 += "\n" + task.result?.get("error")
+                        if(task.result !=null){
+                            if(task.result is Map<*,*>) {
+                                Log.d(TAG, "reserveSchedule: analyzing data, task.result type: Map")
+                                var hashmap = task.result!! as Map<*,*>
+                                if (hashmap.containsKey("message")) {
+                                    msg1 = "예약 성공"
+                                    msg2 = "정상적으로 등록되었습니다."
+                                    toast("Reservation Succesful")
+                                } else {
+                                    try {
+                                        msg1 = "예약 실패"
+                                        if (task.isComplete)
+                                            msg2 = "예약이 거부되었습니다."
+                                        else
+                                            msg2 = "에러가 발생하였습니다."
+                                        msg2 += "\n" + hashmap["error"]
+                                    } catch (e: Exception) {
+                                        msg2 = "예약 실패\n 결과 수신 중 에러가 발생하였습니다."
+                                    }
+                                }
+                            } else if(task.result is HttpsCallableResult) {
+                                Log.d(TAG, "reserveSchedule: analyzing data, task.result type: HttpsCallableResult")
+                                var callableResult = task.result!! as HttpsCallableResult
+                                var data = callableResult.data
+                                if(data is Map<*,*>) {
+                                    Log.d(TAG, "reserveSchedule: analyzing data, callableResult.data type: Map")
+                                    var hashmap = data as Map<*, *>
+                                    if (hashmap.containsKey("message")) {
+                                        msg1 = "예약 성공"
+                                        msg2 = "정상적으로 등록되었습니다."
+                                        toast("Reservation Succesful")
+                                    } else {
+                                        try {
+                                            msg1 = "예약 실패"
+                                            if (task.isComplete)
+                                                msg2 = "예약이 거부되었습니다."
+                                            else
+                                                msg2 = "에러가 발생하였습니다."
+                                            msg2 += "\n" + hashmap["error"]
+                                        } catch (e: Exception) {
+                                            msg2 = "예약 실패\n 결과 수신 중 에러가 발생하였습니다."
+                                        }
+                                    }
+                                } else{
+                                    Log.d(TAG, "reserveSchedule: analyzing data, callableResult.data type: UnKnown")
+                                    msg1 = "Error"
+                                    msg2 = "결과를 확인할 수 없습니다. 새로고침하여 결과를 확인하세요."
+                                }
+                            }
                         }
-                        progressBar.visibility = View.GONE
+                        else{
+                            msg1 = "Error"
+                            msg2 = "결과를 받아오지 못했습니다. 새로고침하여 결과를 확인하세요."
+                        }
+                        progressBarActivity.dismiss()
                         alertDialog {
                             this.title = msg1
                             message = msg2
-                            okButton()
+                            okButton {
+                                if(msg1 == "예약 성공" || msg1 == "Error")
+                                    finish()
+                            }
                         }.show()
-                        finish()
             })
         }
-
-        functions = Firebase.functions
-
     }
 
     fun toggle(view: View){
@@ -218,7 +264,7 @@ class ScheduleCreateActivity : AppCompatActivity(){
             view.visibility = View.GONE
     }
 
-    fun reserveSchedule(title: String, estimated:String, password:String): Task<JSONObject> {
+    fun reserveSchedule(title: String, estimated:String, password:String): Task<Any?> {
 
             var startString = calendarToString(startDay)
             var endString = calendarToString(endDay)
@@ -231,12 +277,17 @@ class ScheduleCreateActivity : AppCompatActivity(){
             )
             return functions.getHttpsCallable("reserveSchedule").call(data)
                     .continueWith { task ->
-                        val result = task.result?.data
-                        var json:JSONObject
-                        if(result == null)
-                            json = JSONObject()
-                        else json = result as JSONObject
-                        json
+                        var result:Any? = null
+                        try{
+                            result = task.result as Map<String, Any?>
+                        }catch(e:ClassCastException){
+                            try{
+                                result = task.result as HttpsCallableResult
+                            }catch (e: Exception){
+                                Log.e("getHttpsCallable.call", e.toString())
+                            }
+                        }
+                        result
                     }
 
     }

@@ -150,8 +150,15 @@ class ReservationListViewModel(val cardID:String) : ViewModel() {
     fun getList():ArrayList<ReservationItem>{
         return reservationList.value!!
     }
+    fun getItemDetail(position: Int): String{
+        var item = reservationList.value?.get(position)
+        return "등록자: " + (item?.userName ?: "NULL") +
+                "\n시작 시간: " + (item?.startTime ?: "NULL") +
+                "\n반납 시간: " + (item?.endTime ?: "NULL") +
+                "\n예상 금액: " + (item?.estimated ?: "NULL") + "원"
+    }
 
-    fun removeItem(position: Int) {
+    fun removeItem(position: Int) { // db에 삭제 명령 보내기.
         TODO("Authorization will be needed")
         if (position < reservationList.value?.size ?: 0) reservationList.value?.get(position)?.addedTime?.let { ref.child(it.toString()).removeValue() }
         else {
