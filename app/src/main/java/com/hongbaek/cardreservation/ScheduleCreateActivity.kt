@@ -23,7 +23,6 @@ import splitties.alertdialog.title
 import splitties.toast.toast
 import java.lang.ClassCastException
 import java.util.*
-import kotlin.collections.HashMap
 
 class ScheduleCreateActivity : AppCompatActivity(){
     private val TAG = "ScheduleCreate_A"
@@ -37,6 +36,7 @@ class ScheduleCreateActivity : AppCompatActivity(){
     private lateinit var dateTimePickers: DateTimePicker
     private lateinit var datePickers: Pair<DatePicker, DatePicker>
     private lateinit var timePickers: Pair<CustomTimePicker, CustomTimePicker>
+    private lateinit var typeSpinner: Spinner
 
     private lateinit var titleEIT: TextInputEditText
     private lateinit var startDateTV: TextView
@@ -115,6 +115,7 @@ class ScheduleCreateActivity : AppCompatActivity(){
         datePickers = Pair(findViewById(R.id.startDatePicker), findViewById(R.id.endDatePicker))
         timePickers = Pair(findViewById<CustomTimePicker>(R.id.startTimePicker), findViewById<CustomTimePicker>(R.id.endTimePicker))
         dateTimePickers = DateTimePicker(datePickers, timePickers)
+        typeSpinner = findViewById(R.id.typeSpinner)
 
         startDateTV = findViewById(R.id.startDayTV)
         startTimeTV = findViewById(R.id.startTimeTV)
@@ -141,6 +142,19 @@ class ScheduleCreateActivity : AppCompatActivity(){
             toggle(startPickerLayout, false)
             toggle(endPickerLayout)
         }
+
+        // Create an ArrayAdapter using the string array and a default spinner layout
+        ArrayAdapter.createFromResource(
+                this,
+                R.array.my_array,
+                android.R.layout.simple_spinner_item
+        ).also { adapter ->
+            // Specify the layout to use when the list of choices appears
+            adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+            // Apply the adapter to the spinner
+            typeSpinner.adapter = adapter
+        }
+
         var currentHour = Calendar.getInstance().get(Calendar.HOUR_OF_DAY)
         var currentMinute = Calendar.getInstance().get(Calendar.MINUTE)
         currentMinute += (5 - currentMinute % 5)
@@ -151,102 +165,8 @@ class ScheduleCreateActivity : AppCompatActivity(){
             finish()
         }
         reserveB.setOnClickListener {
-            var msg = ""
-            if(titleEIT.text.isNullOrBlank()){
-                msg += "사용 용도"
-            }
-            if(estimatedIET.text.isNullOrBlank()){
-                if(msg!="") msg += "/예상 금액"
-                else msg += "예상 금액"
-            }
-            if(passwordIET.text.isNullOrBlank()){
-                if(msg!="") msg += "/비밀번호"
-                else msg += "비밀번호"
-            }
-            if(msg != ""){
-                toast("$msg 칸이 비었습니다.")
-                return@setOnClickListener
-            }
-            val progressBarActivity = ProgressBarActivity(this)
-            progressBarActivity.window!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT));
-            progressBarActivity.show()
-
-            reserveSchedule(titleEIT.text.toString(), userName = "Anonymous", estimatedIET.text.toString(), passwordIET.text.toString())
-                    .addOnCompleteListener(OnCompleteListener { task ->
-                        if (!task.isSuccessful) {
-                            val e = task.exception
-                            Log.w(TAG, "reserveSchedule:onFailure", e)
-                            progressBarActivity.dismiss()
-                            toast("An error occurred.")
-                            return@OnCompleteListener
-                        }
-                        Log.d(TAG, "reserveSchedule: receive data, task.result: " + task.result)
-                        var msg1 = ""
-                        var msg2 = ""
-                        if(task.result !=null){
-                            if(task.result is Map<*,*>) {
-                                Log.d(TAG, "reserveSchedule: analyzing data, task.result type: Map")
-                                var hashmap = task.result!! as Map<*,*>
-                                if (hashmap.containsKey("message")) {
-                                    msg1 = "예약 성공"
-                                    msg2 = "정상적으로 등록되었습니다."
-                                    toast("Reservation Succesful")
-                                } else {
-                                    try {
-                                        msg1 = "예약 실패"
-                                        if (task.isComplete)
-                                            msg2 = "예약이 거부되었습니다."
-                                        else
-                                            msg2 = "에러가 발생하였습니다."
-                                        msg2 += "\n" + hashmap["error"]
-                                    } catch (e: Exception) {
-                                        msg2 = "예약 실패\n 결과 수신 중 에러가 발생하였습니다."
-                                    }
-                                }
-                            } else if(task.result is HttpsCallableResult) {
-                                Log.d(TAG, "reserveSchedule: analyzing data, task.result type: HttpsCallableResult")
-                                var callableResult = task.result!! as HttpsCallableResult
-                                var data = callableResult.data
-                                if(data is Map<*,*>) {
-                                    Log.d(TAG, "reserveSchedule: analyzing data, callableResult.data type: Map")
-                                    var hashmap = data as Map<*, *>
-                                    if (hashmap.containsKey("message")) {
-                                        msg1 = "예약 성공"
-                                        msg2 = "정상적으로 등록되었습니다."
-                                        toast("Reservation Succesful")
-                                    } else {
-                                        try {
-                                            msg1 = "예약 실패"
-                                            if (task.isComplete)
-                                                msg2 = "예약이 거부되었습니다."
-                                            else
-                                                msg2 = "에러가 발생하였습니다."
-                                            msg2 += "\n" + hashmap["error"]
-                                        } catch (e: Exception) {
-                                            msg2 = "예약 실패\n 결과 수신 중 에러가 발생하였습니다."
-                                        }
-                                    }
-                                } else{
-                                    Log.d(TAG, "reserveSchedule: analyzing data, callableResult.data type: UnKnown")
-                                    msg1 = "Error"
-                                    msg2 = "결과를 확인할 수 없습니다. 새로고침하여 결과를 확인하세요."
-                                }
-                            }
-                        }
-                        else{
-                            msg1 = "Error"
-                            msg2 = "결과를 받아오지 못했습니다. 새로고침하여 결과를 확인하세요."
-                        }
-                        progressBarActivity.dismiss()
-                        alertDialog {
-                            this.title = msg1
-                            message = msg2
-                            okButton {
-                                if(msg1 == "예약 성공" || msg1 == "Error")
-                                    finish()
-                            }
-                        }.show()
-            })
+            if(checkReserveItem())
+                reserveSchedule()
         }
     }
 
@@ -264,35 +184,165 @@ class ScheduleCreateActivity : AppCompatActivity(){
             view.visibility = View.GONE
     }
 
-    fun reserveSchedule(title: String, userName: String, estimated:String, password:String): Task<Any?> {
-
-            var startString = calendarToString(startDay)
-            var endString = calendarToString(endDay)
-            val data = hashMapOf(
-                    "title" to title,
-                    "userName" to userName,
-                    "startTime" to startString,
-                    "endTime" to endString,
-                    "password" to password,
-                    "estimated" to estimated
-            )
-            return functions.getHttpsCallable("reserveSchedule").call(data)
-                    .continueWith { task ->
-                        var result:Any? = null
-                        try{
-                            result = task.result as Map<String, Any?>
-                        }catch(e:ClassCastException){
-                            try{
-                                result = task.result as HttpsCallableResult
-                            }catch (e: Exception){
-                                Log.e("getHttpsCallable.call", e.toString())
-                            }
-                        }
-                        result
-                    }
-
+    fun checkReserveItem(): Boolean{
+        var msg = ""
+        if(titleEIT.text.isNullOrBlank()){
+            msg += "사용 용도"
+        }
+        if(estimatedIET.text.isNullOrBlank()){
+            if(msg!="") msg += "/예상 금액"
+            else msg += "예상 금액"
+        }
+        if(passwordIET.text.isNullOrBlank()){
+            if(msg!="") msg += "/비밀번호"
+            else msg += "비밀번호"
+        }
+        if(msg != ""){
+            toast("$msg 칸이 비었습니다.")
+            return false
+        }
+        if(!endDay.after(startDay)){
+            msg += "종료 시간을 시작 시간 뒤로 설정하세요."
+            toast(msg)
+            return false
+        }
+        if(typeSpinner.selectedItemPosition == 0){
+            if(endDay.minusOfMinute(startDay)>360){
+                msg += "최대 예약 시간을 초과했습니다."
+                toast(msg)
+                return false
+            }
+        }
+        else if(typeSpinner.selectedItemPosition == 1){
+            if(endDay.minusOfMinute(startDay)>2880){
+                msg += "최대 예약 시간을 초과했습니다."
+                toast(msg)
+                return false
+            }
+        }
+        else if(typeSpinner.selectedItemPosition == -1){
+            toast("타입을 선택하세요.")
+            return false
+        }
+        else {
+            toast("Unknown type data..")
+            return false
+        }
+        return true
     }
 
+    private fun reserveSchedule(){
+        val progressBarActivity = ProgressBarActivity(this)
+        progressBarActivity.window!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT));
+        progressBarActivity.show()
+
+        pushSchedule(titleEIT.text.toString(), userName = "Anonymous", estimatedIET.text.toString(), passwordIET.text.toString(), typeSpinner.selectedItemPosition+1)
+                .addOnCompleteListener(OnCompleteListener { task ->
+                    if (!task.isSuccessful) {
+                        val e = task.exception
+                        Log.w(TAG, "reserveSchedule:onFailure", e)
+                        progressBarActivity.dismiss()
+                        toast("An error occurred.")
+                        return@OnCompleteListener
+                    }
+                    Log.d(TAG, "reserveSchedule: receive data, task.result: " + task.result)
+                    var msg1 = ""
+                    var msg2 = ""
+                    if(task.result !=null){
+                        if(task.result is Map<*,*>) {
+                            Log.d(TAG, "reserveSchedule: analyzing data, task.result type: Map")
+                            var hashmap = task.result!! as Map<*,*>
+                            if (hashmap.containsKey("message")) {
+                                msg1 = "예약 성공"
+                                msg2 = "정상적으로 등록되었습니다."
+                                toast("Reservation Succesful")
+                            } else {
+                                try {
+                                    msg1 = "예약 실패"
+                                    if (task.isComplete)
+                                        msg2 = "예약이 거부되었습니다."
+                                    else
+                                        msg2 = "에러가 발생하였습니다."
+                                    msg2 += "\n" + hashmap["error"]
+                                } catch (e: Exception) {
+                                    msg2 = "예약 실패\n 결과 수신 중 에러가 발생하였습니다.\n${e.message}"
+                                }
+                            }
+                        } else if(task.result is HttpsCallableResult) {
+                            Log.d(TAG, "reserveSchedule: analyzing data, task.result type: HttpsCallableResult")
+                            var callableResult = task.result!! as HttpsCallableResult
+                            var data = callableResult.data
+                            if(data is Map<*,*>) {
+                                Log.d(TAG, "reserveSchedule: analyzing data, callableResult.data type: Map")
+                                var hashmap = data as Map<*, *>
+                                if (hashmap.containsKey("message")) {
+                                    msg1 = "예약 성공"
+                                    msg2 = "정상적으로 등록되었습니다."
+                                    toast("Reservation Succesful")
+                                } else {
+                                    try {
+                                        msg1 = "예약 실패"
+                                        if (task.isComplete)
+                                            msg2 = "예약이 거부되었습니다."
+                                        else
+                                            msg2 = "에러가 발생하였습니다."
+                                        msg2 += "\n" + hashmap["error"]
+                                    } catch (e: Exception) {
+                                        msg2 = "예약 실패\n 결과 수신 중 에러가 발생하였습니다."
+                                    }
+                                }
+                            } else{
+                                Log.d(TAG, "reserveSchedule: analyzing data, callableResult.data type: UnKnown")
+                                msg1 = "Error"
+                                msg2 = "결과를 확인할 수 없습니다. 새로고침하여 결과를 확인하세요."
+                            }
+                        }
+                    }
+                    else{
+                        msg1 = "Error"
+                        msg2 = "결과를 받아오지 못했습니다. 새로고침하여 결과를 확인하세요."
+                    }
+                    progressBarActivity.dismiss()
+                    alertDialog {
+                        this.title = msg1
+                        message = msg2
+                        okButton {
+                            if(msg1 == "예약 성공" || msg1 == "Error")
+                                finish()
+                        }
+                    }.show()
+                })
+    }
+
+    fun pushSchedule(title: String, userName: String, estimated:String, password:String, type:Int=0): Task<Any?> {
+
+        var startString = calendarToString(startDay)
+        var endString = calendarToString(endDay)
+        val data = hashMapOf(
+                "title" to title,
+                "userName" to userName,
+                "startTime" to startString,
+                "endTime" to endString,
+                "password" to password,
+                "estimated" to estimated,
+                "type" to type
+        )
+        Log.d(TAG, "pushSchedule: sending data: $data")
+        return functions.getHttpsCallable("reserveSchedule").call(data)
+                .continueWith { task ->
+                    var result:Any? = null
+                    try{
+                        result = task.result as Map<String, Any?>
+                    }catch(e:ClassCastException){
+                        try{
+                            result = task.result as HttpsCallableResult
+                        }catch (e: Exception){
+                            Log.e("getHttpsCallable.call", e.toString())
+                        }
+                    }
+                    result
+                }
+    }
 
     fun calendarToString(calendar:Calendar): String{
         var string = "" + calendar.get(Calendar.YEAR)
@@ -311,5 +361,29 @@ class ScheduleCreateActivity : AppCompatActivity(){
         else string += ":$minute"
 
         return string
+    }
+
+    /** minusOfMinute - minutes difference of two Calendar time
+     * @param cal - Calendar to be Compared
+     * @return minutes difference by this.time - cal.time */
+    fun Calendar.minusOfMinute(cal: Calendar):Long {
+        var cal1 = Calendar.getInstance()
+        cal1.timeInMillis=(this.timeInMillis/1000)*1000
+        cal1.set(Calendar.SECOND, 0)
+        var cal2 = Calendar.getInstance()
+        cal2.timeInMillis=(cal.timeInMillis/1000)*1000
+        cal2.set(Calendar.SECOND, 0)
+
+        if(cal1.after(cal2)){ // cal1 > cal2
+            var dif = (cal1.timeInMillis - cal2.timeInMillis)/60000
+            Log.d(TAG, "Calendar.minusofminute - $dif")
+            return dif
+        }
+        else if(cal1.before(cal2)){ // cal2 > cal1
+            var dif = (cal2.timeInMillis - cal1.timeInMillis)/60000
+            Log.d(TAG, "Calendar.minusofminute - $dif")
+            return dif * -1
+        }
+        return 0
     }
 }

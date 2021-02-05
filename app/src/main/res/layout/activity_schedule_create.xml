@@ -41,19 +41,39 @@
 
         </com.google.android.material.textfield.TextInputLayout>
 
+        <TextView
+            android:id="@+id/typeTV"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="20dp"
+            android:layout_marginTop="15dp"
+            android:text="타입"
+            android:textSize="21sp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/titleTIL" />
+
+        <Spinner
+            android:id="@+id/typeSpinner"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="30dp"
+            android:textAlignment="textEnd"
+            app:layout_constraintStart_toEndOf="@+id/typeTV"
+            app:layout_constraintTop_toTopOf="@id/typeTV" />
+
         <LinearLayout
             android:id="@+id/startTimeLL"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="10dp"
-            android:layout_marginTop="20dp"
+            android:layout_marginTop="15dp"
             android:layout_marginEnd="10dp"
             android:clickable="true"
             android:focusable="true"
             android:orientation="vertical"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/titleTIL">
+            app:layout_constraintTop_toBottomOf="@id/typeTV">
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
