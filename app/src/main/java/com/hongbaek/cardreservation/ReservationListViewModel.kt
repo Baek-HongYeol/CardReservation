@@ -4,9 +4,17 @@ import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import com.google.android.gms.tasks.Task
 import com.google.firebase.database.*
+import com.google.firebase.database.ktx.database
 import com.google.firebase.database.ktx.getValue
+import com.google.firebase.functions.FirebaseFunctions
+import com.google.firebase.functions.HttpsCallableResult
+import com.google.firebase.functions.ktx.functions
+import com.google.firebase.ktx.Firebase
 import com.prolificinteractive.materialcalendarview.CalendarDay
+import splitties.toast.toast
+import java.lang.ClassCastException
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -18,17 +26,18 @@ class ReservationListViewModel(val cardID:String) : ViewModel() {
             return ReservationListViewModel(_cardID) as T
         }
     }
+    private val TAG = "ReservationListVM"
     var reservationList: MutableLiveData<ArrayList<ReservationItem>> = MutableLiveData()
-
-    private val database = FirebaseDatabase.getInstance()
+    private val functions:FirebaseFunctions by lazy{ Firebase.functions }
+    private val database:FirebaseDatabase by lazy{ Firebase.database }
     private var ref:DatabaseReference
     private var query: Query
     private var isQueryAvailable:Boolean = false
     private val valueEventListener = object : ChildEventListener {
-        private val TAG = "RealTimeDB/Reservation/$cardID"
+        private val mTAG = "RealTimeDB/Reservation/$cardID"
         override fun onCancelled(error: DatabaseError) {
             // Failed to read value
-            Log.w(TAG, "Failed to read value."+error.message, error.toException())
+            Log.w(mTAG, "Failed to read value."+error.message, error.toException())
         }
 
         override fun onChildMoved(snapshot: DataSnapshot, previousChildName: String?) { }
@@ -158,13 +167,82 @@ class ReservationListViewModel(val cardID:String) : ViewModel() {
                 "\n예상 금액: " + (item?.estimated ?: "NULL") + "원"
     }
 
-    fun removeItem(position: Int) { // db에 삭제 명령 보내기.
-        TODO("Authorization will be needed")
+    fun deleteSchedule(position: Int, password:String): Task<Map<String, *>> { // db에 삭제 명령 보내기.
+        val data = hashMapOf(
+                "password" to password,
+                "refKey" to getList()[position].addedTime
+        )
+        Log.d(TAG, "deleteSchedule: sending data: $data")
+        return functions.getHttpsCallable("checkPassword").call(data)
+                .continueWith { task ->
+                    var result: Any? = null
+                    var msg1 = ""
+                    var msg2 = ""
+                    try {
+                        result = task.result as Map<*, *>
+                        if (result.containsKey("message")) {
+                            msg1 = "삭제 완료"
+                            msg2 = result["message"].toString()
+                        } else {
+                            try {
+                                msg1 = "삭제 실패"
+                                if (task.isComplete)
+                                    msg2 = "삭제가 거부되었습니다."
+                                else
+                                    msg2 = "에러가 발생하였습니다."
+                                msg2 += "\n" + result["error"]
+                            } catch (e: Exception) {
+                                msg2 = "삭제 실패\n 결과 수신 중 에러가 발생하였습니다.\n${e.message}"
+                                Log.e(TAG, "getHttpsCallable.call: $e")
+                            }
+                        }
+                    } catch (e: ClassCastException) {
+                        try {
+                            result = task.result as HttpsCallableResult
+                            var data: Map<*, *>
+                            try {
+                                data = result.data as Map<*, *>
+                                if (data.containsKey("message")) {
+                                    msg1 = "삭제 완료"
+                                    msg2 = data["message"].toString()
+                                } else {
+                                    try {
+                                        msg1 = "삭제 실패"
+                                        if (task.isComplete)
+                                            msg2 = "삭제가 거부되었습니다."
+                                        else
+                                            msg2 = "에러가 발생하였습니다."
+                                        msg2 += "\n" + data["error"]
+                                    } catch (e: Exception) {
+                                        msg1 = "Error"
+                                        msg2 = "삭제 실패\n 결과 수신 중 에러가 발생하였습니다.\n${e.message}"
+                                        Log.e(TAG, "getHttpsCallable.call: $e")
+                                    }
+                                }
+
+                            } catch (e: ClassCastException) {
+                                msg1 = "Error"
+                                msg2 = "삭제 실패\n 결과 수신 중 에러가 발생하였습니다.\n${e.message}"
+                                Log.e(TAG, "getHttpsCallable.call: $e")
+                            }
+                        } catch (e: Exception) {
+                            msg1 = "Error"
+                            msg2 = "결과를 받아오지 못했습니다. 새로고침하여 결과를 확인하세요."
+                            Log.e(TAG, "getHttpsCallable.call: $e")
+                        }
+                    }
+                    if(msg1=="삭제 완료") removeItem(position)
+                    hashMapOf("msg1" to msg1, "msg2" to msg2)
+
+                }
+    }
+    private fun removeItem(position: Int){
         if (position < reservationList.value?.size ?: 0) reservationList.value?.get(position)?.addedTime?.let { ref.child(it.toString()).removeValue() }
         else {
             Log.e("removeItem", "position index overflows list")
         }
     }
+
     private fun isSameDay(a:Calendar, b:Calendar):Boolean{
         return a.get(Calendar.YEAR) == b.get(Calendar.YEAR) &&
                 a.get(Calendar.MONTH) == b.get(Calendar.MONTH) &&
