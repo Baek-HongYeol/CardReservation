@@ -69,25 +69,25 @@ class ScheduleCreateActivity : AppCompatActivity(){
         Log.d(TAG, "onDateChangedListener: isStartDate_ $isStart")
         Log.d(TAG, "onDateChangedListener: $year.${month+1}.$day")
     }
-    private var onTimeChangedListener = TimePicker.OnTimeChangedListener { view, hourOfDay, minute ->
+    private var onTimeChangedListener = TimePicker.OnTimeChangedListener { view, hourOfDay, _ ->
         when (view.id) {
             R.id.startTimePicker -> {
-                startDay.set(Calendar.HOUR_OF_DAY, hourOfDay)
-                startDay.set(Calendar.MINUTE, minute)
                 var minuteValue = (view as CustomTimePicker).getDisplayedMinutes()
                 var minuteT = ""
                 var hourT = ""
+                startDay.set(Calendar.HOUR_OF_DAY, hourOfDay)
+                startDay.set(Calendar.MINUTE, minuteValue)
                 hourT = if(hourOfDay<10) "0${hourOfDay}" else "$hourOfDay"
                 minuteT = if(minuteValue<10) "0$minuteValue" else "$minuteValue"
                 Log.d(TAG, "onTimeChangedListener: hour/minute: $hourT/$minuteT")
                 startTimeTV.text = getString(R.string.formattedTime, hourT, minuteT)
             }
             R.id.endTimePicker -> {
-                endDay.set(Calendar.HOUR_OF_DAY, hourOfDay)
-                endDay.set(Calendar.MINUTE, minute)
                 var minuteValue = (view as CustomTimePicker).getDisplayedMinutes()
                 var minuteT = ""
                 var hourT = ""
+                endDay.set(Calendar.HOUR_OF_DAY, hourOfDay)
+                endDay.set(Calendar.MINUTE, minuteValue)
                 hourT = if(hourOfDay<10) "0${hourOfDay}" else "$hourOfDay"
                 minuteT = if(minuteValue<10) "0$minuteValue" else "$minuteValue"
                 Log.d(TAG, "onTimeChangedListener: hour/minute: $hourT/$minuteT")
@@ -233,8 +233,9 @@ class ScheduleCreateActivity : AppCompatActivity(){
 
     private fun reserveSchedule(){
         val progressBarActivity = ProgressBarActivity(this)
-        progressBarActivity.window!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT));
+        progressBarActivity.window!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
         progressBarActivity.show()
+        progressBarActivity.setMessage(R.string.loading)
 
         pushSchedule(titleEIT.text.toString(), userName = "Anonymous", estimatedIET.text.toString(), passwordIET.text.toString(), typeSpinner.selectedItemPosition+1)
                 .addOnCompleteListener(OnCompleteListener { task ->
@@ -288,7 +289,8 @@ class ScheduleCreateActivity : AppCompatActivity(){
                                             msg2 = "에러가 발생하였습니다."
                                         msg2 += "\n" + hashmap["error"]
                                     } catch (e: Exception) {
-                                        msg2 = "예약 실패\n 결과 수신 중 에러가 발생하였습니다."
+                                        msg2 = "예약 실패\n 결과 수신 중 에러가 발생하였습니다.\n" +
+                                                "${e.message}"
                                     }
                                 }
                             } else{
@@ -373,6 +375,9 @@ class ScheduleCreateActivity : AppCompatActivity(){
         var cal2 = Calendar.getInstance()
         cal2.timeInMillis=(cal.timeInMillis/1000)*1000
         cal2.set(Calendar.SECOND, 0)
+
+        Log.d(TAG, "Calendar.minusofminute cal1: $cal1")
+        Log.d(TAG, "Calendar.minusofminute cal2: $cal2")
 
         if(cal1.after(cal2)){ // cal1 > cal2
             var dif = (cal1.timeInMillis - cal2.timeInMillis)/60000

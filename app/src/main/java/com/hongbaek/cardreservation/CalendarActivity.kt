@@ -1,13 +1,17 @@
 package com.hongbaek.cardreservation
 
 import android.content.DialogInterface
+import android.graphics.Color
 import androidx.appcompat.app.AppCompatActivity
 import android.graphics.Rect
+import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.view.ViewGroup
+import android.widget.EditText
 import android.widget.LinearLayout
+import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
@@ -16,6 +20,8 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.ItemDecoration
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import com.google.android.material.textfield.TextInputLayout
+import com.google.firebase.functions.FirebaseFunctionsException
 import com.hongbaek.cardreservation.utils.SundayDecorator
 import com.prolificinteractive.materialcalendarview.CalendarDay
 import com.prolificinteractive.materialcalendarview.MaterialCalendarView
@@ -78,10 +84,60 @@ class CalendarActivity : AppCompatActivity() {
                         var item = viewModel.getList()[position]
                         alertDialog {
                             title = "예약 이름: " + item.title
-                            setView(R.layout.dialog_delete)
-                            okButton{
-                                toast("삭제 버튼 활성화")
-                                this.show()
+                            val view = layoutInflater.inflate(R.layout.dialog_delete, null)
+                            setCancelable(false)
+                            setView(view)
+                            setPositiveButton(R.string.delete) { _, which ->
+                                val progressBarActivity = ProgressBarActivity(this@CalendarActivity)
+                                progressBarActivity.window!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+                                progressBarActivity.show()
+                                progressBarActivity.setMessage(R.string.checkPassword)
+
+                                viewModel.deleteSchedule(position, view.findViewById<TextView>(R.id.edittextPassword).text.toString())
+                                        .addOnCompleteListener { task ->
+                                            var result = task.result
+                                            if (!task.isSuccessful) {
+                                                val e = task.exception
+                                                if (e is FirebaseFunctionsException) {
+                                                    val code = e.code
+                                                    val details = e.details
+                                                    Log.e(TAG, "deleteSchedule - error code: $code")
+                                                    Log.e(TAG, "deleteSchedule - error detail: $details")
+                                                    alertDialog {
+                                                        title = "Error"
+                                                        if(BuildConfig.DEBUG) message = "오류가 발생했습니다.\n${e.details}"
+                                                        message = "오류가 발생했습니다."
+                                                    }
+                                                } else{
+                                                    Log.e(TAG, "deleteSchedule - error: $e")
+                                                    alertDialog {
+                                                        title = "Error"
+                                                        if(BuildConfig.DEBUG) message = "오류가 발생했습니다.\n${e?.message}"
+                                                        message = "오류가 발생했습니다."
+                                                    }
+                                                }
+
+                                            }
+                                            else if(result?.containsKey("msg1") == true){
+                                                Log.d(TAG, "deleteSchedule_result - ${result.get("msg1") ?:"null"}")
+                                                alertDialog {
+                                                    title = result["msg1"].toString()
+                                                    message = result["msg2"].toString()
+                                                    Log.d(TAG, "delete complete alertDialog show")
+                                                    okButton()
+                                                }.show()
+                                                progressBarActivity.dismiss()
+                                            }
+                                            else{
+                                                Log.d(TAG, "deleteSchedule_result - ${result?.get("msg1") ?:"null"}")
+                                                alertDialog {
+                                                    title = "Error"
+                                                    message = "오류가 발생했습니다.\n 새로고침하여 결과를 확인하세요."
+                                                }
+                                                progressBarActivity.dismiss()
+                                            }
+                                        }
+
                             }
                             cancelButton()
                         }.show()
