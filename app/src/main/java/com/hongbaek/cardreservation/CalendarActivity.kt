@@ -1,5 +1,6 @@
 package com.hongbaek.cardreservation
 
+import android.content.DialogInterface
 import androidx.appcompat.app.AppCompatActivity
 import android.graphics.Rect
 import android.os.Bundle
@@ -22,10 +23,7 @@ import com.sothree.slidinguppanel.SlidingUpPanelLayout
 import com.sothree.slidinguppanel.SlidingUpPanelLayout.*
 import splitties.toast.toast
 import splitties.activities.start
-import splitties.alertdialog.alertDialog
-import splitties.alertdialog.message
-import splitties.alertdialog.okButton
-import splitties.alertdialog.title
+import splitties.alertdialog.*
 
 class CalendarActivity : AppCompatActivity() {
     private val TAG = "Calendar_A"
@@ -62,7 +60,36 @@ class CalendarActivity : AppCompatActivity() {
             }
 
             override fun onLongClick(v: View, position: Int): Boolean {
-                return false
+                alertDialog {
+                    title = viewModel.getList()[position].title
+                    message = viewModel.getItemDetail(position)/*
+                    setPositiveButton(R.string.edit, DialogInterface.OnClickListener { _, which ->
+                        var item = viewModel.getList()[position]
+                        start<ScheduleCreateActivity>{
+                            "key" to item.addedTime
+                            "title" to item.title
+                            "startTime" to item.startTime
+                            "endTime" to item.endTime
+                            "estimated" to item.estimated
+                            "type" to item.type
+                        }
+                    })*/
+                    setNegativeButton(R.string.delete, DialogInterface.OnClickListener { _, _ ->
+                        var item = viewModel.getList()[position]
+                        alertDialog {
+                            title = "예약 이름: " + item.title
+                            setView(R.layout.dialog_delete)
+                            okButton{
+                                toast("삭제 버튼 활성화")
+                                this.show()
+                            }
+                            cancelButton()
+                        }.show()
+
+                    })
+
+                }.show()
+                return true
             }
         })
         adaptor.registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver() {
