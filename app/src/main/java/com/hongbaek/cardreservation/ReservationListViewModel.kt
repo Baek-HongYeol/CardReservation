@@ -101,8 +101,7 @@ class ReservationListViewModel(val cardID:String) : ViewModel() {
     }
 
     private var isPassed: Boolean = false
-    private var currentDay: Calendar = Calendar.getInstance(TimeZone.getDefault(), Locale.KOREA)
-    private var selectedDay:Calendar = currentDay
+    private var selectedDay:Calendar = Calendar.getInstance(TimeZone.getDefault(), Locale.KOREA)
 
     init{
         reservationList.value = ArrayList()
@@ -146,6 +145,7 @@ class ReservationListViewModel(val cardID:String) : ViewModel() {
         startQuery()
     }
     fun reload(day:CalendarDay){
+        var currentDay = Calendar.getInstance(TimeZone.getDefault(), Locale.KOREA)
         var calday = CalendarDay.from(currentDay.get(Calendar.YEAR), currentDay.get(Calendar.MONTH)+1, currentDay.get(Calendar.DAY_OF_MONTH))
         var ispassed = day.isBefore(calday)
         selectedDay.set(day.year, day.month-1, day.day,0,0,0)
@@ -155,6 +155,10 @@ class ReservationListViewModel(val cardID:String) : ViewModel() {
         var queryEnd = calendarDayToString(day, 3)
         setQuery(ispassed, queryStart, queryEnd)
         reload()
+    }
+    fun reload(day:Calendar){
+        var calday = CalendarDay.from(day.get(Calendar.YEAR), day.get(Calendar.MONTH)+1, day.get(Calendar.DAY_OF_MONTH))
+        reload(calday)
     }
     fun getList():ArrayList<ReservationItem>{
         return reservationList.value!!

@@ -107,16 +107,16 @@ class CalendarActivity : AppCompatActivity() {
                                                         title = "Error"
                                                         if(BuildConfig.DEBUG) message = "오류가 발생했습니다.\n${e.details}"
                                                         message = "오류가 발생했습니다."
-                                                    }
+                                                    }.show()
                                                 } else{
                                                     Log.e(TAG, "deleteSchedule - error: $e")
                                                     alertDialog {
                                                         title = "Error"
                                                         if(BuildConfig.DEBUG) message = "오류가 발생했습니다.\n${e?.message}"
                                                         message = "오류가 발생했습니다."
-                                                    }
+                                                    }.show()
                                                 }
-
+                                                progressBarActivity.dismiss()
                                             }
                                             else if(result?.containsKey("msg1") == true){
                                                 Log.d(TAG, "deleteSchedule_result - ${result.get("msg1") ?:"null"}")
@@ -136,6 +136,7 @@ class CalendarActivity : AppCompatActivity() {
                                                 }
                                                 progressBarActivity.dismiss()
                                             }
+                                            viewModel.reload()
                                         }
 
                             }
@@ -174,6 +175,7 @@ class CalendarActivity : AppCompatActivity() {
         calendarView.setDateSelected(CalendarDay.today(), true)
         val sundayDecorator = SundayDecorator(calendarView)
         calendarView.addDecorators(sundayDecorator)
+        viewModel.reload(CalendarDay.today())
 
         recyclerViewManager = LinearLayoutManager(this)
         viewModel.reservationList.observe(this, Observer { reservationList: List<ReservationItem>? ->
@@ -231,6 +233,16 @@ class CalendarActivity : AppCompatActivity() {
                 toast(message)
             }
         })
+    }
+
+    override fun onResume() {
+        super.onResume()
+        viewModel.startQuery()
+    }
+
+    override fun onPause() {
+        super.onPause()
+        viewModel.stopQuery()
     }
     inner class RecyclerViewDecoration(private val divHeight: Int) : ItemDecoration() {
         override fun getItemOffsets(
