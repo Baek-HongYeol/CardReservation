@@ -7,7 +7,7 @@
         <item name="colorOnPrimary">@color/colorOnPrimary</item>
         <item name="android:textColorPrimary">@color/white</item>
         <item name="backgroundColor">@color/gray1</item>
-        <item name="background">@color/gray1</item>
+        <item name="background">@color/backgroundColor</item>
 
         <!-- Secondary brand color. -->
         <item name="colorSecondary">@color/teal_200</item>
@@ -21,6 +21,7 @@
 
     <style name="CustomTextAppearance" parent="TextAppearance.MaterialCalendarWidget.Date">
         <item name="android:textColor">@color/textcolor_selector_dark</item>
+        <item name="android:textSize">@dimen/calendar_date_text_size</item>
     </style>
 
 </resources>

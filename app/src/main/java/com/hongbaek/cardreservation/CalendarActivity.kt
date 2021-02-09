@@ -176,6 +176,7 @@ class CalendarActivity : AppCompatActivity() {
         val sundayDecorator = SundayDecorator(calendarView)
         calendarView.addDecorators(sundayDecorator)
         viewModel.reload(CalendarDay.today())
+        sundayDecorator.onMonthChanged(CalendarDay.today().month)
 
         recyclerViewManager = LinearLayoutManager(this)
         viewModel.reservationList.observe(this, Observer { reservationList: List<ReservationItem>? ->
@@ -198,6 +199,11 @@ class CalendarActivity : AppCompatActivity() {
             if(selected) viewModel.reload(date)
             if(slidingUPL.panelState == PanelState.EXPANDED) slidingUPL.panelState = PanelState.COLLAPSED
         }
+        calendarView.setOnMonthChangedListener { _, date ->
+            sundayDecorator.onMonthChanged(date.month)
+            calendarView.invalidateDecorators()
+        }
+
         val header =calendarView.findViewById<LinearLayout>(R.id.header)
         header.setBackgroundColor(ContextCompat.getColor(header.context, R.color.colorPrimary))
         val param = header.layoutParams as ViewGroup.MarginLayoutParams
