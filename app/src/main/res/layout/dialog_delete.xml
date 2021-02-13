@@ -10,7 +10,7 @@
     android:paddingRight="16dp">
 
     <TextView
-        android:id="@+id/textviewLogo"
+        android:id="@+id/titleTV"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/deleteConfirm"
@@ -21,7 +21,7 @@
 
 
     <TextView
-        android:id="@+id/textviewPassword"
+        android:id="@+id/passwordTV"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="4dp"
@@ -29,17 +29,17 @@
         android:text="@string/password"
         android:textAppearance="?android:attr/textAppearanceMedium"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textviewLogo" />
+        app:layout_constraintTop_toBottomOf="@+id/titleTV" />
 
     <EditText
-        android:id="@+id/edittextPassword"
+        android:id="@+id/passwordET"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="10dp"
         android:ems="10"
         android:inputType="textPassword"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textviewPassword"
+        app:layout_constraintTop_toBottomOf="@+id/passwordTV"
         android:autofillHints="" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

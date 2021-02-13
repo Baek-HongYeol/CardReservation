@@ -26,7 +26,9 @@
     <string name="password">예약 비밀번호</string>
     <string name="edit">수정</string>
     <string name="delete">삭제</string>
+    <string name="returning">반납</string>
     <string name="deleteConfirm">예약을 취소합니다.</string>
+    <string name="returnConfirm">일정이 종료되었음을 알리세요!</string>
     <string name="loading">서버에 등록하는 중입니다...</string>
     <string name="checkPassword">암호를 확인하는 중입니다...</string>
 </resources>

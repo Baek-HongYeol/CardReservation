@@ -64,6 +64,7 @@ dependencies {
     implementation("com.louiscad.splitties:splitties-activities:$splitties_version")
     implementation("com.louiscad.splitties:splitties-toast:$splitties_version")
     implementation("com.louiscad.splitties:splitties-alertdialog:$splitties_version")
+    implementation("com.louiscad.splitties:splitties-alertdialog-material:$splitties_version")
 
     testImplementation 'junit:junit:4.+'
     androidTestImplementation 'androidx.test.ext:junit:1.1.2'

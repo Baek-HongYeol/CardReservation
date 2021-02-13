@@ -9,7 +9,6 @@ import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.view.ViewGroup
-import android.widget.EditText
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.core.content.ContextCompat
@@ -20,7 +19,6 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.ItemDecoration
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.google.android.material.floatingactionbutton.FloatingActionButton
-import com.google.android.material.textfield.TextInputLayout
 import com.google.firebase.functions.FirebaseFunctionsException
 import com.hongbaek.cardreservation.utils.SundayDecorator
 import com.prolificinteractive.materialcalendarview.CalendarDay
@@ -30,6 +28,13 @@ import com.sothree.slidinguppanel.SlidingUpPanelLayout.*
 import splitties.toast.toast
 import splitties.activities.start
 import splitties.alertdialog.*
+import splitties.alertdialog.alertDialog
+import splitties.alertdialog.appcompat.*
+import splitties.alertdialog.cancelButton
+import splitties.alertdialog.material.materialAlertDialog
+import splitties.alertdialog.message
+import splitties.alertdialog.okButton
+import splitties.alertdialog.title
 
 class CalendarActivity : AppCompatActivity() {
     private val TAG = "Calendar_A"
@@ -66,20 +71,87 @@ class CalendarActivity : AppCompatActivity() {
             }
 
             override fun onLongClick(v: View, position: Int): Boolean {
-                alertDialog {
+                materialAlertDialog {
                     title = viewModel.getList()[position].title
-                    message = viewModel.getItemDetail(position)/*
-                    setPositiveButton(R.string.edit, DialogInterface.OnClickListener { _, which ->
+                    message = viewModel.getItemDetail(position)
+                    setPositiveButton(R.string.returning, DialogInterface.OnClickListener { _, which ->
                         var item = viewModel.getList()[position]
-                        start<ScheduleCreateActivity>{
-                            "key" to item.addedTime
-                            "title" to item.title
-                            "startTime" to item.startTime
-                            "endTime" to item.endTime
-                            "estimated" to item.estimated
-                            "type" to item.type
-                        }
-                    })*/
+                        materialAlertDialog {
+                            title = "예약 이름: " + item.title
+                            val view = layoutInflater.inflate(R.layout.dialog_delete, null)
+                            setCancelable(false)
+                            setView(view)
+                            setPositiveButton(R.string.returning) { _, which ->
+                                val progressBarActivity = ProgressBarActivity(this@CalendarActivity)
+                                progressBarActivity.window!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+                                progressBarActivity.show()
+                                progressBarActivity.setMessage(R.string.checkPassword)
+
+                                viewModel.completeSchedule(position, view.findViewById<TextView>(R.id.passwordET).text.toString())
+                                    .addOnCompleteListener { task ->
+                                        Log.d(TAG, "completeSchedule onComplete - task: ${task.toString()}")
+                                        if(!task.isSuccessful){
+                                            val e = task.exception
+                                            if (e is FirebaseFunctionsException) {
+                                                val code = e.code
+                                                val details = e.details
+                                                Log.e(TAG, "completeSchedule - error code: $code")
+                                                Log.e(TAG, "completeSchedule - error detail: $details")
+                                                alertDialog {
+                                                    title = "Error"
+                                                    if(BuildConfig.DEBUG) message = "오류가 발생했습니다.\n${e.details}"
+                                                    message = "오류가 발생했습니다."
+                                                }.show()
+                                            } else{
+                                                Log.e(TAG, "completeSchedule - error: $e")
+                                                alertDialog {
+                                                    title = "Error"
+                                                    if(BuildConfig.DEBUG) message = "오류가 발생했습니다.\n${e?.message}"
+                                                    message = "오류가 발생했습니다."
+                                                }.show()
+                                            }
+                                            progressBarActivity.dismiss()
+                                        }
+                                        else {
+                                            var result = task.result
+                                            if (result?.containsKey("msg1") == true) {
+                                                Log.d(
+                                                    TAG,
+                                                    "completeSchedule_result - ${result.get("msg1") ?: "null"}"
+                                                )
+                                                alertDialog {
+                                                    title = result["msg1"].toString()
+                                                    message = result["msg2"].toString()
+                                                    Log.d(TAG, "change complete alertDialog show")
+                                                    okButton()
+                                                }.show()
+                                                progressBarActivity.dismiss()
+                                            } else {
+                                                Log.d(
+                                                    TAG,
+                                                    "completeSchedule_result - ${result?.get("msg1") ?: "null"}"
+                                                )
+                                                alertDialog {
+                                                    title = "Error"
+                                                    message = "오류가 발생했습니다.\n 새로고침하여 결과를 확인하세요."
+                                                }
+                                                progressBarActivity.dismiss()
+                                            }
+                                        }
+                                        viewModel.reload()
+                                    }
+
+                            }
+                        }.onShow(){
+                            if(BuildConfig.VERSION_CODE >= 23) {
+                                positiveButton.setTextColor(context.getColor(R.color.colorOnPrimary))
+                            }
+                            else {
+                                positiveButton.setTextColor(resources.getColor(R.color.colorOnPrimary))
+                            }
+                        }.show()
+
+                    })
                     setNegativeButton(R.string.delete, DialogInterface.OnClickListener { _, _ ->
                         var item = viewModel.getList()[position]
                         alertDialog {
@@ -93,9 +165,8 @@ class CalendarActivity : AppCompatActivity() {
                                 progressBarActivity.show()
                                 progressBarActivity.setMessage(R.string.checkPassword)
 
-                                viewModel.deleteSchedule(position, view.findViewById<TextView>(R.id.edittextPassword).text.toString())
+                                viewModel.deleteSchedule(position, view.findViewById<TextView>(R.id.passwordET).text.toString())
                                         .addOnCompleteListener { task ->
-                                            var result = task.result
                                             if (!task.isSuccessful) {
                                                 val e = task.exception
                                                 if (e is FirebaseFunctionsException) {
@@ -118,23 +189,34 @@ class CalendarActivity : AppCompatActivity() {
                                                 }
                                                 progressBarActivity.dismiss()
                                             }
-                                            else if(result?.containsKey("msg1") == true){
-                                                Log.d(TAG, "deleteSchedule_result - ${result.get("msg1") ?:"null"}")
-                                                alertDialog {
-                                                    title = result["msg1"].toString()
-                                                    message = result["msg2"].toString()
-                                                    Log.d(TAG, "delete complete alertDialog show")
-                                                    okButton()
-                                                }.show()
-                                                progressBarActivity.dismiss()
-                                            }
-                                            else{
-                                                Log.d(TAG, "deleteSchedule_result - ${result?.get("msg1") ?:"null"}")
-                                                alertDialog {
-                                                    title = "Error"
-                                                    message = "오류가 발생했습니다.\n 새로고침하여 결과를 확인하세요."
+                                            else {
+                                                var result = task.result
+                                                if (result?.containsKey("msg1") == true) {
+                                                    Log.d(
+                                                        TAG,
+                                                        "deleteSchedule_result - ${result.get("msg1") ?: "null"}"
+                                                    )
+                                                    alertDialog {
+                                                        title = result["msg1"].toString()
+                                                        message = result["msg2"].toString()
+                                                        Log.d(
+                                                            TAG,
+                                                            "delete complete alertDialog show"
+                                                        )
+                                                        okButton()
+                                                    }.show()
+                                                    progressBarActivity.dismiss()
+                                                } else {
+                                                    Log.d(
+                                                        TAG,
+                                                        "deleteSchedule_result - ${result?.get("msg1") ?: "null"}"
+                                                    )
+                                                    alertDialog {
+                                                        title = "Error"
+                                                        message = "오류가 발생했습니다.\n 새로고침하여 결과를 확인하세요."
+                                                    }
+                                                    progressBarActivity.dismiss()
                                                 }
-                                                progressBarActivity.dismiss()
                                             }
                                             viewModel.reload()
                                         }
@@ -145,6 +227,15 @@ class CalendarActivity : AppCompatActivity() {
 
                     })
 
+                }.onShow{
+                    if(BuildConfig.VERSION_CODE >= 23) {
+                        positiveButton.setTextColor(context.getColor(R.color.colorOnPrimary))
+                        negativeButton.setTextColor(context.getColor(R.color.colorOnPrimary))
+                    }
+                    else {
+                        positiveButton.setTextColor(resources.getColor(R.color.colorOnPrimary))
+                        negativeButton.setTextColor(resources.getColor(R.color.colorOnPrimary))
+                    }
                 }.show()
                 return true
             }
@@ -175,7 +266,7 @@ class CalendarActivity : AppCompatActivity() {
         calendarView.setDateSelected(CalendarDay.today(), true)
         val sundayDecorator = SundayDecorator(calendarView)
         calendarView.addDecorators(sundayDecorator)
-        viewModel.reload(CalendarDay.today())
+        viewModel.initQuery()
         sundayDecorator.onMonthChanged(CalendarDay.today().month)
 
         recyclerViewManager = LinearLayoutManager(this)
@@ -196,6 +287,7 @@ class CalendarActivity : AppCompatActivity() {
         }
 
         calendarView.setOnDateChangedListener { widget, date, selected ->
+            Log.d(TAG, "calendarView_dateChanged")
             if(selected) viewModel.reload(date)
             if(slidingUPL.panelState == PanelState.EXPANDED) slidingUPL.panelState = PanelState.COLLAPSED
         }
