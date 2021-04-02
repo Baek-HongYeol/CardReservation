@@ -49,11 +49,13 @@ class ReservationListViewModel(val cardID:String) : ViewModel() {
                 val changed : ReservationItem? = dataSnapshot.getValue<ReservationItem>()
                 val list = reservationList.value!!
                 for(item in list){
-                    if(item.addedTime == changed?.addedTime){
-                        Log.d("RLVM_onChildChanged", "found changed index")
+                    if(item.addedTime == dataSnapshot.key){
+                        Log.d(tag, "found changed index")
                         val idx = list.indexOf(item)
                         Log.d("RLVM_onChildChanged-idx", idx.toString())
                         if (changed != null) {
+                            changed.addedTime = dataSnapshot.key
+                            changed.adaptTime()
                             list[idx] = changed
                             Log.d("RLVM_onChildChanged", "item exchanged")
                         }
@@ -100,6 +102,7 @@ class ReservationListViewModel(val cardID:String) : ViewModel() {
             if(pos>=0) {
                 list.removeAt(pos)
             }
+            reservationList.postValue(list)
         }
     }
 
@@ -116,11 +119,9 @@ class ReservationListViewModel(val cardID:String) : ViewModel() {
         var endQuery = calendarDayToString(calday, 3)
         try {
             ref = database.getReference("Reservation/$cardID")
-            this.startQuery = startQuery
-            this.endQuery = endQuery
             query = ref.orderByChild("startTime")
-                    .startAt(this.startQuery, "startTime")
-                    .endAt(this.endQuery, "startTime")
+                    .startAt(startQuery, "startTime")
+                    .endAt(endQuery, "startTime")
         }catch(e:Exception){
             Log.e("RLVM", "setQuery->"+e.message)
             e.printStackTrace()
@@ -150,8 +151,9 @@ class ReservationListViewModel(val cardID:String) : ViewModel() {
         try {
             ref = if (isPassed) database.getReference("Reservation/$cardID")
             else database.getReference("Reservation/$cardID")
-            startQuery = startDay
-            endQuery = endDay
+            query = ref.orderByChild("startTime")
+                    .startAt(startDay, "startTime")
+                    .endAt(endDay, "startTime")
         }catch(e:Exception){
             Log.e("RLVM", "setQuery->"+e.message)
             e.printStackTrace()
