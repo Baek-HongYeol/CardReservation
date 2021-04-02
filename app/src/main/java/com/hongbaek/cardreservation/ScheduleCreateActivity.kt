@@ -112,11 +112,12 @@ class ScheduleCreateActivity : AppCompatActivity(){
         startPickerLayout = findViewById(R.id.startPickerLayout)
         endPickerLayout = findViewById(R.id.endPickerLayout)
 
+        // Date, Time을 다루는 데이터
         datePickers = Pair(findViewById(R.id.startDatePicker), findViewById(R.id.endDatePicker))
         timePickers = Pair(findViewById<CustomTimePicker>(R.id.startTimePicker), findViewById<CustomTimePicker>(R.id.endTimePicker))
         dateTimePickers = DateTimePicker(datePickers, timePickers)
         typeSpinner = findViewById(R.id.typeSpinner)
-
+        //일시를 표시하는 View
         startDateTV = findViewById(R.id.startDayTV)
         startTimeTV = findViewById(R.id.startTimeTV)
         endDateTV = findViewById(R.id.endDayTV)
@@ -161,6 +162,17 @@ class ScheduleCreateActivity : AppCompatActivity(){
         dateTimePickers.onDateChangedListener = onDateChangedListener
         dateTimePickers.onTimeChangedListener = onTimeChangedListener
         dateTimePickers.init(year,month,date, currentHour, currentMinute/5)
+
+        var initTimes = dateTimePickers.getTimes()
+        var timePair = timeToStr(initTimes.first)
+        startTimeTV.text = getString(R.string.formattedTime, timePair.first, timePair.second)
+        startDay.set(Calendar.HOUR_OF_DAY, initTimes.first.first)
+        startDay.set(Calendar.MINUTE, initTimes.first.second)
+        timePair = timeToStr(initTimes.second)
+        endTimeTV.text = getString(R.string.formattedTime, timePair.first, timePair.second)
+        endDay.set(Calendar.HOUR_OF_DAY, initTimes.second.first)
+        endDay.set(Calendar.MINUTE, initTimes.second.second)
+
         cancelB.setOnClickListener {
             finish()
         }
@@ -390,5 +402,12 @@ class ScheduleCreateActivity : AppCompatActivity(){
             return dif * -1
         }
         return 0
+    }
+    fun timeToStr(time: Pair<Int, Int>):Pair<String, String>{
+        var hour = time.first
+        var minute = time.second
+        var hourT = if (hour<10) "0$hour" else "$hour"
+        var minuteT = if (minute<10) "0$minute" else "$minute"
+        return Pair(hourT, minuteT)
     }
 }

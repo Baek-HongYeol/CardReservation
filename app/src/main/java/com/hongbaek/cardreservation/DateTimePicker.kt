@@ -58,5 +58,15 @@ class DateTimePicker(var datePicker: Pair<DatePicker, DatePicker>, var timePicke
         }
 
     }
+    fun getTimes(): Pair<Pair<Int, Int>, Pair<Int,Int>>{
+        val context = timePicker.first.context
+        return if(Build.VERSION.SDK_INT >= 23){
+            Pair(Pair(timePicker.first.hour, timePicker.first.getDisplayedMinutes()),
+                Pair(timePicker.second.hour, timePicker.second.getDisplayedMinutes()))
+        }else{
+            Pair(Pair(timePicker.first.currentHour, timePicker.first.getDisplayedMinutes()),
+                Pair(timePicker.second.currentHour, timePicker.second.getDisplayedMinutes()))
+        }
+    }
 
 }
