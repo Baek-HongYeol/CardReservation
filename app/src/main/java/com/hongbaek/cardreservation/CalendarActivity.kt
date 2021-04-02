@@ -86,7 +86,7 @@ class CalendarActivity : AppCompatActivity() {
                                 progressBarActivity.show()
                                 progressBarActivity.setMessage(R.string.checkPassword)
 
-                                viewModel.completeSchedule(position, view.findViewById<TextView>(R.id.passwordET).text.toString())
+                                viewModel.completeSchedule(position, view.findViewById<TextView>(R.id.passwordIET).text.toString())
                                     .addOnCompleteListener { task ->
                                         Log.d(TAG, "completeSchedule onComplete - task: ${task.toString()}")
                                         if(!task.isSuccessful){
