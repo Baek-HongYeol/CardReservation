@@ -24,26 +24,33 @@
         app:umanoShadowHeight="5dp">
 
         <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/calendarLL"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            app:layout_constraintEnd_toStartOf="@+id/calendarView"
-            app:layout_constraintStart_toStartOf="@+id/calendarView">
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/calendarCL">
 
-            <com.prolificinteractive.materialcalendarview.MaterialCalendarView
-                android:id="@+id/calendarView"
-                android:layout_width="wrap_content"
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/calendarLL"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="@color/panelBackgroundColor"
-                android:focusable="auto"
+                android:orientation="vertical"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:mcv_arrowColor="@color/colorOnPrimary"
-                app:mcv_dateTextAppearance="@style/CustomTextAppearance"
-                app:mcv_selectionColor="@color/selectedDayBackColor"
-                app:mcv_showOtherDates="all" />
+                app:layout_constraintTop_toTopOf="parent">
+
+                <com.prolificinteractive.materialcalendarview.MaterialCalendarView
+                    android:id="@+id/calendarView"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:focusable="auto"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:mcv_arrowColor="@color/colorOnPrimary"
+                    app:mcv_dateTextAppearance="@style/CustomTextAppearance"
+                    app:mcv_selectionColor="@color/selectedDayBackColor"
+                    app:mcv_showOtherDates="all"
+                    app:mcv_tileHeight="60dp" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 

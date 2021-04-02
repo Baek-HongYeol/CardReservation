@@ -78,8 +78,7 @@ class CalendarActivity : AppCompatActivity() {
                         var item = viewModel.getList()[position]
                         materialAlertDialog {
                             title = "예약 이름: " + item.title
-                            val view = layoutInflater.inflate(R.layout.dialog_delete, null)
-                            setCancelable(false)
+                            val view = layoutInflater.inflate(R.layout.dialog_return, null)
                             setView(view)
                             setPositiveButton(R.string.returning) { _, which ->
                                 val progressBarActivity = ProgressBarActivity(this@CalendarActivity)
@@ -157,7 +156,6 @@ class CalendarActivity : AppCompatActivity() {
                         alertDialog {
                             title = "예약 이름: " + item.title
                             val view = layoutInflater.inflate(R.layout.dialog_delete, null)
-                            setCancelable(false)
                             setView(view)
                             setPositiveButton(R.string.delete) { _, which ->
                                 val progressBarActivity = ProgressBarActivity(this@CalendarActivity)
