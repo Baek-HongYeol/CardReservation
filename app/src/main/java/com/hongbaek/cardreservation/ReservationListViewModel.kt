@@ -31,8 +31,6 @@ class ReservationListViewModel(val cardID:String) : ViewModel() {
     private val database:FirebaseDatabase by lazy{ Firebase.database }
     private var ref:DatabaseReference = database.getReference("Reservation/$cardID")
     private lateinit var query: Query
-    private var startQuery: String = ""
-    private var endQuery: String = ""
     private var isQueryAvailable:Boolean = false
     private val valueEventListener = object : ChildEventListener {
         private val mTAG = "RealTimeDB/Reservation/$cardID"
@@ -44,7 +42,8 @@ class ReservationListViewModel(val cardID:String) : ViewModel() {
         override fun onChildMoved(snapshot: DataSnapshot, previousChildName: String?) { }
 
         override fun onChildChanged(dataSnapshot: DataSnapshot, previousChildName: String?) {
-            Log.d("RLA_onChildChanged", previousChildName?:"null")
+            val tag = "RLVM_onChildChanged"
+            Log.d(tag, "previousChildName = $previousChildName")
             try{
                 val changed : ReservationItem? = dataSnapshot.getValue<ReservationItem>()
                 val list = reservationList.value!!
@@ -52,12 +51,13 @@ class ReservationListViewModel(val cardID:String) : ViewModel() {
                     if(item.addedTime == dataSnapshot.key){
                         Log.d(tag, "found changed index")
                         val idx = list.indexOf(item)
-                        Log.d("RLVM_onChildChanged-idx", idx.toString())
+                        Log.d(tag, "idx - $idx")
                         if (changed != null) {
                             changed.addedTime = dataSnapshot.key
                             changed.adaptTime()
                             list[idx] = changed
-                            Log.d("RLVM_onChildChanged", "item exchanged")
+                            Log.d(tag, "status: ${changed.status}")
+                            Log.d(tag, "item exchanged")
                         }
                     }
                 }
@@ -74,6 +74,7 @@ class ReservationListViewModel(val cardID:String) : ViewModel() {
             Log.d(tag, "onChildAdded-ID: " + (dataSnapshot.key?:"null"))
             val reservation: ReservationItem? = dataSnapshot.getValue<ReservationItem>()
             if (reservation != null) {
+                Log.d(tag, "status: ${reservation.status}")
                 val list = reservationList.value!!
                 Log.d(tag, "onChildAdded-name: " + (reservation.userName?:"null"))
                 Log.d(tag, "onChildAdded-Title " + (reservation.title?:"null"))
@@ -190,7 +191,7 @@ class ReservationListViewModel(val cardID:String) : ViewModel() {
                 "refKey" to getList()[position].addedTime
         )
         Log.d(TAG, "deleteSchedule: sending data: $data")
-        return functions.getHttpsCallable("checkPassword").call(data)
+        return functions.getHttpsCallable("deleteSchedule").call(data)
                 .continueWith { task ->
                     var result: Any? = null
                     var msg1 = ""
@@ -209,7 +210,7 @@ class ReservationListViewModel(val cardID:String) : ViewModel() {
                                 else
                                     msg2 = "에러가 발생하였습니다."
                                 msg2 += "\n" + result["error"]
-                                Log.d(TAG, "deleteSchedule: Map<> Result has data: ${result["error"]}")
+                                Log.d(TAG, "deleteSchedule: Map<> Result has data: $result")
                             } catch (e: Exception) {
                                 msg2 = "삭제 실패\n 결과 수신 중 에러가 발생하였습니다.\n${e.message}"
                                 Log.e(TAG, "getHttpsCallable.call: $e")
@@ -233,7 +234,7 @@ class ReservationListViewModel(val cardID:String) : ViewModel() {
                                         else
                                             msg2 = "에러가 발생하였습니다."
                                         msg2 += "\n" + data["error"]
-                                        Log.d(TAG, "deleteSchedule: HttpsCallable Result has data: ${data["error"]}")
+                                        Log.d(TAG, "deleteSchedule: HttpsCallable Result has data: $data")
                                     } catch (e: Exception) {
                                         msg1 = "Error"
                                         msg2 = "삭제 실패\n 결과 수신 중 에러가 발생하였습니다.\n${e.message}"
@@ -282,6 +283,7 @@ class ReservationListViewModel(val cardID:String) : ViewModel() {
                             else
                                 msg2 = "에러가 발생하였습니다."
                             msg2 += "\n" + result["error"]
+                            Log.d(TAG, "completeSchedule: Map<> Result has data: $result")
                         } catch (e: Exception) {
                             msg2 = "변경 실패\n 결과 수신 중 에러가 발생하였습니다.\n${e.message}"
                             Log.e(TAG, "getHttpsCallable.call: $e")
@@ -304,6 +306,7 @@ class ReservationListViewModel(val cardID:String) : ViewModel() {
                                     else
                                         msg2 = "에러가 발생하였습니다."
                                     msg2 += "\n" + data["error"]
+                                    Log.d(TAG, "completeSchedule: HttpsCallable Result has data: $data")
                                 } catch (e: Exception) {
                                     msg1 = "Error"
                                     msg2 = "변경 실패\n 결과 수신 중 에러가 발생하였습니다.\n${e.message}"

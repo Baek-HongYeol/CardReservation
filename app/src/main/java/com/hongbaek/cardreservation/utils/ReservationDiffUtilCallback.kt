@@ -26,6 +26,7 @@ class ReservationDiffUtilCallback(private val oldList:List<ReservationItem>, pri
         val isStartTimeSame = oldItem.startTime.compareTo(newItem.startTime) == 0
         val isEndTimeSame = oldItem.endTime.compareTo(newItem.endTime) == 0
         val isUIDSame = oldItem.uid.equals(newItem.uid)
-        return isIdSame && isNameSame && isStartTimeSame && isEndTimeSame && isUIDSame
+        val isStatusSame = oldItem.status.equals(newItem.status)
+        return isIdSame && isNameSame && isStartTimeSame && isEndTimeSame && isUIDSame && isStatusSame
     }
 }

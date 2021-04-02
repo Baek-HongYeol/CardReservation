@@ -14,6 +14,8 @@ class ReservationItem {
     var estimated: Int = 0
     lateinit var startTime : String
     lateinit var endTime : String
+    var status: STATUS = STATUS.default
+
     var calStartTime: Calendar
     var calEndTime: Calendar
     var tempTime: Timestamp = Timestamp(1610540083000)
@@ -53,4 +55,38 @@ class ReservationItem {
         endTime = df.format(calEndTime.time)
         return true
     }
+
+    fun isStatus(mStatus:String){
+        try{
+            status = STATUS.valueOf(mStatus)
+        }catch(e:Exception){
+            status = STATUS.default
+        }
+    }
+
+    enum class STATUS(status:String?) {
+        RESERVED("RESERVED"){
+            override fun toString(): String = "예약됨"
+        },
+        RUNNING("RUNNING"){
+            override fun toString(): String = "진행중"
+        },
+        COMPLETED("COMPLETED"){
+            override fun toString(): String = "시간종료"
+        },
+        RETURNED("RETURNED"){
+            override fun toString(): String = "반납완료"
+        },
+        UNKNOWN("UNKNOWN"){
+            override fun toString(): String = ""
+        };
+
+        companion object {
+            val default:STATUS
+                get() = UNKNOWN
+        }
+
+        abstract override fun toString():String
+    }
+
 }

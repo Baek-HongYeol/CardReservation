@@ -1,6 +1,7 @@
 package com.hongbaek.cardreservation
 
 import android.annotation.SuppressLint
+import android.graphics.Color
 import android.util.Log
 import android.view.View
 import android.view.ViewGroup
@@ -17,8 +18,16 @@ class ReserveHolder(itemView: View) : RecyclerView.ViewHolder(itemView){
     fun bind(item:ReservationItem){
         Log.d("RHolder_bind-name", item.userName?:"null")
         Log.d("RHolder_bind-period", item.startTime +" ~ " + item.endTime)
+        var statusTV = itemView.findViewById<TextView>(R.id.itemStatus)
         itemView.findViewById<TextView>(R.id.itemTitleTV).text = item.title
         itemView.findViewById<TextView>(R.id.periodTextView).text = item.startTime + " ~ " + item.endTime
+        statusTV.text = item.status.toString()
+        when(item.status){
+            ReservationItem.STATUS.RESERVED -> statusTV.setTextColor(Color.BLUE)
+            ReservationItem.STATUS.RUNNING -> statusTV.setTextColor(Color.GREEN)
+            ReservationItem.STATUS.COMPLETED -> statusTV.setTextColor(Color.RED)
+            ReservationItem.STATUS.RETURNED -> statusTV.setTextColor(Color.LTGRAY)
+        }
     }
 
 }
