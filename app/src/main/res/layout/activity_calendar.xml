@@ -16,7 +16,7 @@
         android:gravity="bottom"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:umanoDragView="@id/linearlayoutSRL"
+        app:umanoDragView="@id/swipebarLayout"
         app:umanoOverlay="false"
         app:umanoPanelHeight="200dp"
         app:umanoParallaxOffset="0dp"
@@ -52,6 +52,7 @@
                     app:mcv_showOtherDates="all"
                     app:mcv_tileHeight="60dp" />
 
+            </androidx.constraintlayout.widget.ConstraintLayout>
         </androidx.constraintlayout.widget.ConstraintLayout>
 
         <LinearLayout
@@ -61,14 +62,21 @@
             android:background="@color/panelBackgroundColor"
             android:orientation="vertical">
 
-            <View
-                android:id="@+id/swipebar"
-                android:layout_width="60dp"
-                android:layout_height="9dp"
-                android:layout_gravity="center_horizontal"
-                android:layout_marginTop="10dp"
-                android:layout_marginBottom="10dp"
-                android:background="@drawable/ic_baseline_drag_handle_24" />
+            <LinearLayout
+                android:id="@+id/swipebarLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <View
+                    android:id="@+id/swipebar"
+                    android:layout_width="60dp"
+                    android:layout_height="12dp"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_marginTop="15dp"
+                    android:layout_marginBottom="15dp"
+                    android:background="@drawable/ic_baseline_drag_handle_24" />
+            </LinearLayout>
 
             <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
                 android:id="@+id/swipeRefreshLayout"
