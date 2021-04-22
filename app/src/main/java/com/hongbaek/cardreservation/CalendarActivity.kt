@@ -98,15 +98,15 @@ class CalendarActivity : AppCompatActivity() {
                                                 Log.e(TAG, "completeSchedule - error detail: $details")
                                                 alertDialog {
                                                     title = "Error"
-                                                    if(BuildConfig.DEBUG) message = "오류가 발생했습니다.\n${e.details}"
-                                                    message = "오류가 발생했습니다."
+                                                    if(BuildConfig.DEBUG) message = "오류가 발생했습니다.(DEBUG)\n${e.details}"
+                                                    else message = "오류가 발생했습니다."
                                                 }.show()
                                             } else{
                                                 Log.e(TAG, "completeSchedule - error: $e")
                                                 alertDialog {
                                                     title = "Error"
-                                                    if(BuildConfig.DEBUG) message = "오류가 발생했습니다.\n${e?.message}"
-                                                    message = "오류가 발생했습니다."
+                                                    if(BuildConfig.DEBUG) message = "오류가 발생했습니다.(DEBUG)\n${e?.message}"
+                                                    else message = "오류가 발생했습니다."
                                                 }.show()
                                             }
                                             progressBarActivity.dismiss()
@@ -116,19 +116,19 @@ class CalendarActivity : AppCompatActivity() {
                                             if (result?.containsKey("msg1") == true) {
                                                 Log.d(
                                                     TAG,
-                                                    "completeSchedule_result - ${result.get("msg1") ?: "null"}"
+                                                    "completeSchedule_result - $result"
                                                 )
                                                 alertDialog {
                                                     title = result["msg1"].toString()
                                                     message = result["msg2"].toString()
-                                                    Log.d(TAG, "change complete alertDialog show")
+                                                    Log.d(TAG, "status update complete alertDialog show")
                                                     okButton()
                                                 }.show()
                                                 progressBarActivity.dismiss()
                                             } else {
                                                 Log.d(
                                                     TAG,
-                                                    "completeSchedule_result - ${result?.get("msg1") ?: "null"}"
+                                                    "completeSchedule_result - $result"
                                                 )
                                                 alertDialog {
                                                     title = "Error"
@@ -174,15 +174,15 @@ class CalendarActivity : AppCompatActivity() {
                                                     Log.e(TAG, "deleteSchedule - error detail: $details")
                                                     alertDialog {
                                                         title = "Error"
-                                                        if(BuildConfig.DEBUG) message = "오류가 발생했습니다.\n${e.details}"
-                                                        message = "오류가 발생했습니다."
+                                                        if(BuildConfig.DEBUG) message = "오류가 발생했습니다.(DEBUG)\n${e.details}"
+                                                        else message = "오류가 발생했습니다."
                                                     }.show()
                                                 } else{
                                                     Log.e(TAG, "deleteSchedule - error: $e")
                                                     alertDialog {
                                                         title = "Error"
-                                                        if(BuildConfig.DEBUG) message = "오류가 발생했습니다.\n${e?.message}"
-                                                        message = "오류가 발생했습니다."
+                                                        if(BuildConfig.DEBUG) message = "오류가 발생했습니다.(DEBUG)\n${e?.message}"
+                                                        else message = "오류가 발생했습니다."
                                                     }.show()
                                                 }
                                                 progressBarActivity.dismiss()
@@ -199,7 +199,7 @@ class CalendarActivity : AppCompatActivity() {
                                                         message = result["msg2"].toString()
                                                         Log.d(
                                                             TAG,
-                                                            "delete complete alertDialog show"
+                                                            "deletion complete alertDialog show"
                                                         )
                                                         okButton()
                                                     }.show()
@@ -269,6 +269,7 @@ class CalendarActivity : AppCompatActivity() {
 
         recyclerViewManager = LinearLayoutManager(this)
         viewModel.reservationList.observe(this, Observer { reservationList: List<ReservationItem>? ->
+            Log.d(TAG, "list change observed")
             if (reservationList == null) {
                 return@Observer
             }

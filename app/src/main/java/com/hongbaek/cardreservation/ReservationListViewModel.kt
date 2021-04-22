@@ -145,6 +145,7 @@ class ReservationListViewModel(val cardID:String) : ViewModel() {
         }
     }
     fun stopQuery(){
+        Log.d("RLVM", "stopQuery executed")
         if(isQueryAvailable) query.removeEventListener(valueEventListener)
         reservationList.value = ArrayList()
     }
@@ -197,61 +198,38 @@ class ReservationListViewModel(val cardID:String) : ViewModel() {
                     var msg1 = ""
                     var msg2 = ""
                     try {
-                        result = task.result as Map<*, *>
-                        if (result.containsKey("message")) {
-                            msg1 = "삭제 완료"
-                            msg2 = result["message"].toString()
-                            Log.d(TAG, "deleteSchedule: Map<> Result has data")
-                        } else {
-                            try {
-                                msg1 = "삭제 실패"
-                                if (task.isComplete)
-                                    msg2 = "삭제가 거부되었습니다."
-                                else
-                                    msg2 = "에러가 발생하였습니다."
-                                msg2 += "\n" + result["error"]
-                                Log.d(TAG, "deleteSchedule: Map<> Result has data: $result")
-                            } catch (e: Exception) {
-                                msg2 = "삭제 실패\n 결과 수신 중 에러가 발생하였습니다.\n${e.message}"
-                                Log.e(TAG, "getHttpsCallable.call: $e")
-                            }
-                        }
-                    } catch (e: ClassCastException) {
+                        result = task.result as HttpsCallableResult
+                        var data: Map<*, *>
                         try {
-                            result = task.result as HttpsCallableResult
-                            var data: Map<*, *>
-                            try {
-                                data = result.data as Map<*, *>
-                                if (data.containsKey("message")) {
-                                    msg1 = "삭제 완료"
-                                    msg2 = data["message"].toString()
-                                    Log.d(TAG, "deleteSchedule: HttpsCallable Result has data")
-                                } else {
-                                    try {
-                                        msg1 = "삭제 실패"
-                                        if (task.isComplete)
-                                            msg2 = "삭제가 거부되었습니다."
-                                        else
-                                            msg2 = "에러가 발생하였습니다."
-                                        msg2 += "\n" + data["error"]
-                                        Log.d(TAG, "deleteSchedule: HttpsCallable Result has data: $data")
-                                    } catch (e: Exception) {
-                                        msg1 = "Error"
-                                        msg2 = "삭제 실패\n 결과 수신 중 에러가 발생하였습니다.\n${e.message}"
-                                        Log.e(TAG, "getHttpsCallable.call: $e")
-                                    }
+                            data = result.data as Map<*, *>
+                            if (data.containsKey("message")) {
+                                msg1 = "삭제 완료"
+                                msg2 = data["message"].toString()
+                                Log.d(TAG, "deleteSchedule: HttpsCallable Result has data")
+                            } else {
+                                try {
+                                    msg1 = "삭제 실패"
+                                    if (task.isComplete)
+                                        msg2 = "삭제가 거부되었습니다."
+                                    else
+                                        msg2 = "에러가 발생하였습니다."
+                                    msg2 += "\n" + data["error"]
+                                    Log.d(TAG, "deleteSchedule: HttpsCallable Result has other data: $data")
+                                } catch (e: Exception) {
+                                    msg1 = "Error"
+                                    msg2 = "삭제 실패\n 결과 수신 중 에러가 발생하였습니다.\n${e.message}"
+                                    Log.e(TAG, "getHttpsCallable.call: $e")
                                 }
-
-                            } catch (e: ClassCastException) {
-                                msg1 = "Error"
-                                msg2 = "삭제 실패\n 결과 수신 중 에러가 발생하였습니다.\n${e.message}"
-                                Log.e(TAG, "getHttpsCallable.call: $e")
                             }
-                        } catch (e: Exception) {
+                        } catch (e: ClassCastException) {
                             msg1 = "Error"
-                            msg2 = "결과를 받아오지 못했습니다. 새로고침하여 결과를 확인하세요."
+                            msg2 = "삭제 실패\n 결과 수신 중 에러가 발생하였습니다.\n${e.message}"
                             Log.e(TAG, "getHttpsCallable.call: $e")
                         }
+                    } catch (e: Exception) {
+                        msg1 = "Error"
+                        msg2 = "결과를 받아오지 못했습니다. 새로고침하여 결과를 확인하세요."
+                        Log.e(TAG, "getHttpsCallable.call: $e")
                     }
                     if(msg1=="삭제 완료") data["refKey"]?.let { removeItem(position, it) }
                     hashMapOf("msg1" to msg1, "msg2" to msg2)
@@ -271,61 +249,48 @@ class ReservationListViewModel(val cardID:String) : ViewModel() {
                 var msg1 = ""
                 var msg2 = ""
                 try {
-                    result = task.result as Map<*, *>
-                    if (result.containsKey("message")) {
-                        msg1 = "변경 완료"
-                        msg2 = result["message"].toString()
-                    } else {
-                        try {
-                            msg1 = "변경 실패"
-                            if (task.isComplete)
-                                msg2 = "변경이 거부되었습니다."
-                            else
-                                msg2 = "에러가 발생하였습니다."
-                            msg2 += "\n" + result["error"]
-                            Log.d(TAG, "completeSchedule: Map<> Result has data: $result")
-                        } catch (e: Exception) {
-                            msg2 = "변경 실패\n 결과 수신 중 에러가 발생하였습니다.\n${e.message}"
-                            Log.e(TAG, "getHttpsCallable.call: $e")
-                        }
-                    }
-                } catch (e: ClassCastException) {
+                    result = task.result as HttpsCallableResult
+                    var data: Map<*, *>
                     try {
-                        result = task.result as HttpsCallableResult
-                        var data: Map<*, *>
-                        try {
-                            data = result.data as Map<*, *>
-                            if (data.containsKey("message")) {
-                                msg1 = "변경 완료"
-                                msg2 = data["message"].toString()
-                            } else {
-                                try {
-                                    msg1 = "변경 실패"
-                                    if (task.isComplete)
-                                        msg2 = "변경이 거부되었습니다."
-                                    else
-                                        msg2 = "에러가 발생하였습니다."
-                                    msg2 += "\n" + data["error"]
-                                    Log.d(TAG, "completeSchedule: HttpsCallable Result has data: $data")
-                                } catch (e: Exception) {
-                                    msg1 = "Error"
-                                    msg2 = "변경 실패\n 결과 수신 중 에러가 발생하였습니다.\n${e.message}"
-                                    Log.e(TAG, "getHttpsCallable.call: $e")
-                                }
+                        data = result.data as Map<*, *>
+                        if (data.containsKey("error")) {
+                            try {
+                                msg1 = "변경 실패"
+                                if (task.isComplete)
+                                    msg2 = "변경이 거부되었습니다."
+                                else
+                                    msg2 = "에러가 발생하였습니다."
+                                msg2 += "\n" + data["error"]
+                                Log.d(TAG, "completeSchedule: HttpsCallable Result has other data: $data")
+                            } catch (e: Exception) {
+                                msg1 = "Error"
+                                msg2 = "변경 실패\n 결과 수신 중 에러가 발생하였습니다.\n${e.message}"
+                                Log.e(TAG, "getHttpsCallable.call: $e")
                             }
-
-                        } catch (e: ClassCastException) {
-                            msg1 = "Error"
-                            msg2 = "변경 실패\n 결과 수신 중 에러가 발생하였습니다.\n${e.message}"
-                            Log.e(TAG, "getHttpsCallable.call: $e")
                         }
-                    } catch (e: Exception) {
+                        else {
+                            if(data.containsKey("message")){
+                                msg1 = "완료"
+                                msg2 = "처리가 종료되었습니다."
+                                Log.d(TAG, "completeSchedule: HttpsCallable Result has message: $data")
+                            }
+                            else {
+                                msg1 = "Complete"
+                                msg2 = "완료되었습니다."
+                            }
+                        }
+
+                    } catch (e: ClassCastException) {
                         msg1 = "Error"
-                        msg2 = "결과를 받아오지 못했습니다. 새로고침하여 결과를 확인하세요."
-                        Log.e(TAG, "getHttpsCallable.call: $e")
+                        msg2 = "변경 실패\n 결과 수신 중 에러가 발생하였습니다.\n${e.message}"
+                        Log.e(TAG, "getHttpsCallable.call ClassCastException: $e")
                     }
+                } catch (e: Exception) {
+                    msg1 = "Error"
+                    msg2 = "결과를 받아오지 못했습니다. 새로고침하여 결과를 확인하세요."
+                    Log.e(TAG, "getHttpsCallable.call Exception: $e")
                 }
-                if(msg1=="변경 완료") data["refKey"]?.let { removeItem(position, it) }
+                //if(msg1=="Complete") data["refKey"]?.let { removeItem(position, it) }
                 hashMapOf("msg1" to msg1, "msg2" to msg2)
 
             }
