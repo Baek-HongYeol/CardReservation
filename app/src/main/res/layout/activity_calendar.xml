@@ -24,6 +24,7 @@
         app:umanoShadowHeight="5dp">
 
         <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/calendarCL"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:id="@+id/calendarCL">
@@ -48,6 +49,7 @@
                     app:layout_constraintTop_toTopOf="parent"
                     app:mcv_arrowColor="@color/colorOnPrimary"
                     app:mcv_dateTextAppearance="@style/CustomTextAppearance"
+                    app:mcv_headerTextAppearance="@style/CustomHeaderTextAppearance"
                     app:mcv_selectionColor="@color/selectedDayBackColor"
                     app:mcv_showOtherDates="all"
                     app:mcv_tileHeight="60dp" />

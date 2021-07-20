@@ -11,10 +11,6 @@
     <color name="colorIn">#FF348E1B</color>
     <color name="colorOut">#FFFF4747</color>
 
-
-    <color name="dayTextColor">#717171</color>
-    <color name="selectedDayTextColor">#F1F1F1</color>
-    <color name="otherdayTextColor">#8F9F9F9F</color>
     <color name="selectedDayBackColor">#177CCC</color>
 
 

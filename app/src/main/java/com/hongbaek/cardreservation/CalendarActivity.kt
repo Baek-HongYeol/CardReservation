@@ -262,10 +262,14 @@ class CalendarActivity : AppCompatActivity() {
         fab_add = findViewById(R.id.fab_reservation_add)
 
         calendarView.setDateSelected(CalendarDay.today(), true)
+        calendarView.setTitleFormatter { day ->
+            "${day.year} ${day.month}월"
+        }
         val sundayDecorator = SundayDecorator(calendarView)
         calendarView.addDecorators(sundayDecorator)
-        viewModel.initQuery()
         sundayDecorator.onMonthChanged(CalendarDay.today().month)
+
+        viewModel.initQuery()
 
         recyclerViewManager = LinearLayoutManager(this)
         viewModel.reservationList.observe(this, Observer { reservationList: List<ReservationItem>? ->
@@ -297,12 +301,9 @@ class CalendarActivity : AppCompatActivity() {
 
         val header =calendarView.findViewById<LinearLayout>(R.id.header)
         header.setBackgroundColor(ContextCompat.getColor(header.context, R.color.colorPrimary))
-        val param = header.layoutParams as ViewGroup.MarginLayoutParams
-        param.setMargins(0, 0, 0, 10)
-        param.width = LinearLayout.LayoutParams.MATCH_PARENT
-        header.layoutParams = param
-        recyclerView.addItemDecoration(RecyclerViewDecoration(30));
-        slidingUPL.addPanelSlideListener(object: PanelSlideListener{
+
+        recyclerView.addItemDecoration(RecyclerViewDecoration(30))
+        slidingUPL.addPanelSlideListener(object : PanelSlideListener {
             override fun onPanelSlide(panel: View?, slideOffset: Float) {}
 
             override fun onPanelStateChanged(
