@@ -321,6 +321,11 @@ class CalendarActivity : AppCompatActivity() {
             }
         })
         slidingUPL.panelState = PanelState.COLLAPSED
+
+        val shadowView = findViewById<View>(R.id.calendarCL)
+        shadowView.isClickable = true
+        slidingUPL.setFadeOnClickListener { slidingUPL.panelState = PanelState.COLLAPSED }
+
         fab_add.hide()
         fab_add.setOnClickListener( fabClickListener )
 
