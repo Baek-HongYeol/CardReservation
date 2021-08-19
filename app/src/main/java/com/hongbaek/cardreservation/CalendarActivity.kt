@@ -2,15 +2,16 @@ package com.hongbaek.cardreservation
 
 import android.content.DialogInterface
 import android.graphics.Color
-import androidx.appcompat.app.AppCompatActivity
 import android.graphics.Rect
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.util.Log
+import android.view.Menu
+import android.view.MenuItem
 import android.view.View
-import android.view.ViewGroup
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
@@ -25,16 +26,12 @@ import com.prolificinteractive.materialcalendarview.CalendarDay
 import com.prolificinteractive.materialcalendarview.MaterialCalendarView
 import com.sothree.slidinguppanel.SlidingUpPanelLayout
 import com.sothree.slidinguppanel.SlidingUpPanelLayout.*
-import splitties.toast.toast
 import splitties.activities.start
 import splitties.alertdialog.*
 import splitties.alertdialog.alertDialog
 import splitties.alertdialog.appcompat.*
-import splitties.alertdialog.cancelButton
 import splitties.alertdialog.material.materialAlertDialog
-import splitties.alertdialog.message
-import splitties.alertdialog.okButton
-import splitties.alertdialog.title
+import splitties.toast.toast
 
 class CalendarActivity : AppCompatActivity() {
     private val TAG = "Calendar_A"
@@ -301,6 +298,7 @@ class CalendarActivity : AppCompatActivity() {
 
         val header =calendarView.findViewById<LinearLayout>(R.id.header)
         header.setBackgroundColor(ContextCompat.getColor(header.context, R.color.colorPrimary))
+        header.findViewById<TextView>(R.id.month_name).setBackgroundColor(ContextCompat.getColor(header.context, R.color.colorPrimary))
 
         recyclerView.addItemDecoration(RecyclerViewDecoration(30))
         slidingUPL.addPanelSlideListener(object : PanelSlideListener {
@@ -347,6 +345,22 @@ class CalendarActivity : AppCompatActivity() {
         super.onPause()
         viewModel.stopQuery()
     }
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.menu_calendar, menu)
+        return super.onCreateOptionsMenu(menu)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            R.id.setting -> {
+                toast("설정 clicked")
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
+        }
+    }
+
     inner class RecyclerViewDecoration(private val divHeight: Int) : ItemDecoration() {
         override fun getItemOffsets(
             outRect: Rect,

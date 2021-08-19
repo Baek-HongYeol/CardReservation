@@ -5,13 +5,12 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
-    tools:context=".ReservationListActivity">
+    tools:context=".CalendarActivity">
 
     <com.sothree.slidinguppanel.SlidingUpPanelLayout
         android:id="@+id/slidingUpPanel"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/backgroundColor"
         android:fitsSystemWindows="true"
         android:gravity="bottom"
         app:layout_constraintStart_toStartOf="parent"
@@ -27,13 +26,12 @@
             android:id="@+id/calendarCL"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:id="@+id/calendarCL">
+            android:background="@color/backgroundColor">
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/calendarLL"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@color/panelBackgroundColor"
                 android:orientation="vertical"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -47,7 +45,7 @@
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
-                    app:mcv_arrowColor="@color/colorOnPrimary"
+                    app:mcv_arrowColor="?attr/colorOnSurface"
                     app:mcv_dateTextAppearance="@style/CustomTextAppearance"
                     app:mcv_headerTextAppearance="@style/CustomHeaderTextAppearance"
                     app:mcv_selectionColor="@color/selectedDayBackColor"
@@ -61,13 +59,13 @@
             android:id="@+id/linearlayoutSRL"
             android:layout_width="match_parent"
             android:layout_height="400dp"
-            android:background="@color/panelBackgroundColor"
             android:orientation="vertical">
 
             <LinearLayout
                 android:id="@+id/swipebarLayout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:background="?attr/colorSurface"
                 android:orientation="vertical">
 
                 <View
