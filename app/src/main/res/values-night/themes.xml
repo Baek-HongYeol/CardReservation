@@ -13,9 +13,6 @@
         <item name="colorSurface">@color/panelBackgroundColor</item>
         <item name="colorOnSurface">@color/white</item>
 
-        <item name="android:background">@color/panelBackgroundColor</item>
-        <item name="colorOnBackground">@color/white</item>
-
         <!-- Status bar color. -->
         <item name="android:statusBarColor" tools:targetApi="l">?attr/colorPrimaryVariant</item>
         <item name="android:actionBarStyle">@style/ActionBarStyle</item>
@@ -37,7 +34,7 @@
         <item name="colorSurface">@color/panelBackgroundColor</item>
         <item name="colorOnSurface">@color/white</item>
 
-        <item name="android:background">@color/panelBackgroundColor</item>
+        <item name="android:background">@color/panelBackgroundColor</item>  <!-- 캘린더의 하위 뷰들의 색상이 연동 됨-->
         <item name="colorOnBackground">@color/white</item>
 
         <!-- Status bar color. -->

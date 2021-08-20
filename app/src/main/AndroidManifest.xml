@@ -21,9 +21,9 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".MainActivity"/>
-        <activity android:name=".ReservationListActivity" />
+        <activity android:name=".MainActivity" />
         <activity android:name=".ScheduleCreateActivity" />
+        <activity android:name=".SettingActivity"/>
     </application>
 
 </manifest>
