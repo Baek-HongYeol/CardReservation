@@ -36,10 +36,13 @@ import splitties.toast.toast
 class CalendarActivity : AppCompatActivity() {
     private val TAG = "Calendar_A"
     private val viewModel: ReservationListViewModel  by lazy{
-        ViewModelProvider(this, ReservationListViewModel.Factory(cardID)).get(ReservationListViewModel::class.java)
+        ViewModelProvider(this, ReservationListViewModel.Factory(objectID)).get(ReservationListViewModel::class.java)
     }
-    private val cardID:String by lazy{
-        intent.getStringExtra("cardID").toString()
+    private val objectID:String by lazy{
+        if(intent.getStringExtra("objectId")==null)
+            "Card"
+        else
+            intent.getStringExtra("objectID").toString()
     }
     private lateinit var calendarView: MaterialCalendarView
     private lateinit var recyclerView: RecyclerView

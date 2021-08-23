@@ -18,22 +18,22 @@ import java.util.*
 import kotlin.collections.ArrayList
 
 
-class ReservationListViewModel(val cardID:String) : ViewModel() {
-    class Factory(private val _cardID:String) : ViewModelProvider.Factory {
+class ReservationListViewModel(val objectID:String) : ViewModel() {
+    class Factory(private val _objectID:String) : ViewModelProvider.Factory {
         override fun <T : ViewModel?> create(modelClass: Class<T>): T {
-            Log.d("RLVM Factory-cardID", _cardID)
-            return ReservationListViewModel(_cardID) as T
+            Log.d("RLVM Factory-cardID", _objectID)
+            return ReservationListViewModel(_objectID) as T
         }
     }
     private val TAG = "ReservationListVM"
     var reservationList: MutableLiveData<ArrayList<ReservationItem>> = MutableLiveData()
     private val functions:FirebaseFunctions by lazy{ Firebase.functions }
     private val database:FirebaseDatabase by lazy{ Firebase.database }
-    private var ref:DatabaseReference = database.getReference("Reservation/$cardID")
+    private var ref:DatabaseReference = database.getReference("Reservation/$objectID")
     private lateinit var query: Query
     private var isQueryAvailable:Boolean = false
     private val valueEventListener = object : ChildEventListener {
-        private val mTAG = "RealTimeDB/Reservation/$cardID"
+        private val mTAG = "RealTimeDB/Reservation/$objectID"
         override fun onCancelled(error: DatabaseError) {
             // Failed to read value
             Log.w(mTAG, "Failed to read value."+error.message, error.toException())
@@ -119,7 +119,7 @@ class ReservationListViewModel(val cardID:String) : ViewModel() {
         var startQuery = calendarDayToString(calday, -3)
         var endQuery = calendarDayToString(calday, 3)
         try {
-            ref = database.getReference("Reservation/$cardID")
+            ref = database.getReference("Reservation/$objectID")
             query = ref.orderByChild("startTime")
                     .startAt(startQuery, "startTime")
                     .endAt(endQuery, "startTime")
@@ -151,8 +151,8 @@ class ReservationListViewModel(val cardID:String) : ViewModel() {
     }
     private fun setQuery(isPassed:Boolean, startDay:String, endDay:String){
         try {
-            ref = if (isPassed) database.getReference("Reservation/$cardID")
-            else database.getReference("Reservation/$cardID")
+            ref = if (isPassed) database.getReference("Reservation/$objectID")
+            else database.getReference("Reservation/$objectID")
             query = ref.orderByChild("startTime")
                     .startAt(startDay, "startTime")
                     .endAt(endDay, "startTime")
