@@ -52,7 +52,7 @@ class CalendarActivity : AppCompatActivity() {
     private lateinit var fab_add: FloatingActionButton
     private var fabClickListener: View.OnClickListener = View.OnClickListener {
         Log.d("fabClickListener", "'executed")
-        var day = calendarView.selectedDate!!
+        val day = calendarView.selectedDate!!
         start<ScheduleCreateActivity>{
             putExtra("sYear", day.year)
             putExtra("sMonth", day.month)
@@ -61,7 +61,7 @@ class CalendarActivity : AppCompatActivity() {
     }
 
     private val recyclerViewAdaptor: ReserveAdaptor by lazy{
-        val adaptor = ReserveAdaptor(object : ReserveAdaptor.ItemEventListener{
+        val adaptor = ReserveAdaptor(object : ReserveAdaptor.ItemEventListener {
             override fun onClick(v: View, position: Int) {
                 alertDialog {
                     title = viewModel.getList()[position].title
@@ -74,90 +74,87 @@ class CalendarActivity : AppCompatActivity() {
                 materialAlertDialog {
                     title = viewModel.getList()[position].title
                     message = viewModel.getItemDetail(position)
-                    setPositiveButton(R.string.returning, DialogInterface.OnClickListener { _, which ->
-                        var item = viewModel.getList()[position]
+                    setPositiveButton(R.string.returning) { _, _ ->
+                        val item = viewModel.getList()[position]
                         materialAlertDialog {
                             title = "예약 이름: " + item.title
                             val view = layoutInflater.inflate(R.layout.dialog_return, null)
                             setView(view)
-                            setPositiveButton(R.string.returning) { _, which ->
+                            setPositiveButton(R.string.returning) { _, _ ->
                                 val progressBarActivity = ProgressBarActivity(this@CalendarActivity)
                                 progressBarActivity.window!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
                                 progressBarActivity.show()
                                 progressBarActivity.setMessage(R.string.checkPassword)
 
                                 viewModel.completeSchedule(position, view.findViewById<TextView>(R.id.passwordIET).text.toString())
-                                    .addOnCompleteListener { task ->
-                                        Log.d(TAG, "completeSchedule onComplete - task: ${task.toString()}")
-                                        if(!task.isSuccessful){
-                                            val e = task.exception
-                                            if (e is FirebaseFunctionsException) {
-                                                val code = e.code
-                                                val details = e.details
-                                                Log.e(TAG, "completeSchedule - error code: $code")
-                                                Log.e(TAG, "completeSchedule - error detail: $details")
-                                                alertDialog {
-                                                    title = "Error"
-                                                    if(BuildConfig.DEBUG) message = "오류가 발생했습니다.(DEBUG)\n${e.details}"
-                                                    else message = "오류가 발생했습니다."
-                                                }.show()
-                                            } else{
-                                                Log.e(TAG, "completeSchedule - error: $e")
-                                                alertDialog {
-                                                    title = "Error"
-                                                    if(BuildConfig.DEBUG) message = "오류가 발생했습니다.(DEBUG)\n${e?.message}"
-                                                    else message = "오류가 발생했습니다."
-                                                }.show()
-                                            }
-                                            progressBarActivity.dismiss()
-                                        }
-                                        else {
-                                            var result = task.result
-                                            if (result?.containsKey("msg1") == true) {
-                                                Log.d(
-                                                    TAG,
-                                                    "completeSchedule_result - $result"
-                                                )
-                                                alertDialog {
-                                                    title = result["msg1"].toString()
-                                                    message = result["msg2"].toString()
-                                                    Log.d(TAG, "status update complete alertDialog show")
-                                                    okButton()
-                                                }.show()
-                                                progressBarActivity.dismiss()
-                                            } else {
-                                                Log.d(
-                                                    TAG,
-                                                    "completeSchedule_result - $result"
-                                                )
-                                                alertDialog {
-                                                    title = "Error"
-                                                    message = "오류가 발생했습니다.\n 새로고침하여 결과를 확인하세요."
+                                        .addOnCompleteListener { task ->
+                                            Log.d(TAG, "completeSchedule onComplete - task: ${task.toString()}")
+                                            if (!task.isSuccessful) {
+                                                val e = task.exception
+                                                if (e is FirebaseFunctionsException) {
+                                                    val code = e.code
+                                                    val details = e.details
+                                                    Log.e(TAG, "completeSchedule - error code: $code")
+                                                    Log.e(TAG, "completeSchedule - error detail: $details")
+                                                    alertDialog {
+                                                        title = "Error"
+                                                        if (BuildConfig.DEBUG) message = "오류가 발생했습니다.(DEBUG)\n${e.details}"
+                                                        else message = "오류가 발생했습니다."
+                                                    }.show()
+                                                } else {
+                                                    Log.e(TAG, "completeSchedule - error: $e")
+                                                    alertDialog {
+                                                        title = "Error"
+                                                        if (BuildConfig.DEBUG) message = "오류가 발생했습니다.(DEBUG)\n${e?.message}"
+                                                        else message = "오류가 발생했습니다."
+                                                    }.show()
                                                 }
                                                 progressBarActivity.dismiss()
+                                            } else {
+                                                val result = task.result
+                                                if (result?.containsKey("msg1") == true) {
+                                                    Log.d(
+                                                            TAG,
+                                                            "completeSchedule_result - $result"
+                                                    )
+                                                    alertDialog {
+                                                        title = result["msg1"].toString()
+                                                        message = result["msg2"].toString()
+                                                        Log.d(TAG, "status update complete alertDialog show")
+                                                        okButton()
+                                                    }.show()
+                                                    progressBarActivity.dismiss()
+                                                } else {
+                                                    Log.d(
+                                                            TAG,
+                                                            "completeSchedule_result - $result"
+                                                    )
+                                                    alertDialog {
+                                                        title = "Error"
+                                                        message = "오류가 발생했습니다.\n 새로고침하여 결과를 확인하세요."
+                                                    }
+                                                    progressBarActivity.dismiss()
+                                                }
                                             }
+                                            viewModel.reload()
                                         }
-                                        viewModel.reload()
-                                    }
-
                             }
-                        }.onShow(){
-                            if(BuildConfig.VERSION_CODE >= 23) {
+                        }.onShow() {
+                            if (BuildConfig.VERSION_CODE >= 23) {
                                 positiveButton.setTextColor(context.getColor(R.color.colorOnPrimary))
-                            }
-                            else {
+                            } else {
                                 positiveButton.setTextColor(resources.getColor(R.color.colorOnPrimary))
                             }
                         }.show()
 
-                    })
-                    setNegativeButton(R.string.delete, DialogInterface.OnClickListener { _, _ ->
-                        var item = viewModel.getList()[position]
+                    }
+                    setNegativeButton(R.string.delete) { _, _ ->
+                        val item = viewModel.getList()[position]
                         alertDialog {
                             title = "예약 이름: " + item.title
                             val view = layoutInflater.inflate(R.layout.dialog_delete, null)
                             setView(view)
-                            setPositiveButton(R.string.delete) { _, which ->
+                            setPositiveButton(R.string.delete) { _, _ ->
                                 val progressBarActivity = ProgressBarActivity(this@CalendarActivity)
                                 progressBarActivity.window!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
                                 progressBarActivity.show()
@@ -174,40 +171,39 @@ class CalendarActivity : AppCompatActivity() {
                                                     Log.e(TAG, "deleteSchedule - error detail: $details")
                                                     alertDialog {
                                                         title = "Error"
-                                                        if(BuildConfig.DEBUG) message = "오류가 발생했습니다.(DEBUG)\n${e.details}"
+                                                        if (BuildConfig.DEBUG) message = "오류가 발생했습니다.(DEBUG)\n${e.details}"
                                                         else message = "오류가 발생했습니다."
                                                     }.show()
-                                                } else{
+                                                } else {
                                                     Log.e(TAG, "deleteSchedule - error: $e")
                                                     alertDialog {
                                                         title = "Error"
-                                                        if(BuildConfig.DEBUG) message = "오류가 발생했습니다.(DEBUG)\n${e?.message}"
+                                                        if (BuildConfig.DEBUG) message = "오류가 발생했습니다.(DEBUG)\n${e?.message}"
                                                         else message = "오류가 발생했습니다."
                                                     }.show()
                                                 }
                                                 progressBarActivity.dismiss()
-                                            }
-                                            else {
-                                                var result = task.result
+                                            } else {
+                                                val result = task.result
                                                 if (result?.containsKey("msg1") == true) {
                                                     Log.d(
-                                                        TAG,
-                                                        "deleteSchedule_result - ${result.get("msg1") ?: "null"}"
+                                                            TAG,
+                                                            "deleteSchedule_result - ${result.get("msg1") ?: "null"}"
                                                     )
                                                     alertDialog {
                                                         title = result["msg1"].toString()
                                                         message = result["msg2"].toString()
                                                         Log.d(
-                                                            TAG,
-                                                            "deletion complete alertDialog show"
+                                                                TAG,
+                                                                "deletion complete alertDialog show"
                                                         )
                                                         okButton()
                                                     }.show()
                                                     progressBarActivity.dismiss()
                                                 } else {
                                                     Log.d(
-                                                        TAG,
-                                                        "deleteSchedule_result - ${result?.get("msg1") ?: "null"}"
+                                                            TAG,
+                                                            "deleteSchedule_result - ${result?.get("msg1") ?: "null"}"
                                                     )
                                                     alertDialog {
                                                         title = "Error"
@@ -223,14 +219,13 @@ class CalendarActivity : AppCompatActivity() {
                             cancelButton()
                         }.show()
 
-                    })
+                    }
 
-                }.onShow{
-                    if(BuildConfig.VERSION_CODE >= 23) {
+                }.onShow {
+                    if (BuildConfig.VERSION_CODE >= 23) {
                         positiveButton.setTextColor(context.getColor(R.color.colorOnPrimary))
                         negativeButton.setTextColor(context.getColor(R.color.colorOnPrimary))
-                    }
-                    else {
+                    } else {
                         positiveButton.setTextColor(resources.getColor(R.color.colorOnPrimary))
                         negativeButton.setTextColor(resources.getColor(R.color.colorOnPrimary))
                     }
@@ -289,7 +284,7 @@ class CalendarActivity : AppCompatActivity() {
             swipeRefreshLayout.isRefreshing=false
         }
 
-        calendarView.setOnDateChangedListener { widget, date, selected ->
+        calendarView.setOnDateChangedListener { _, date, selected ->
             Log.d(TAG, "calendarView_dateChanged")
             if(selected) viewModel.reload(date)
             if(slidingUPL.panelState == PanelState.EXPANDED) slidingUPL.panelState = PanelState.COLLAPSED
@@ -308,16 +303,15 @@ class CalendarActivity : AppCompatActivity() {
             override fun onPanelSlide(panel: View?, slideOffset: Float) {}
 
             override fun onPanelStateChanged(
-                panel: View?,
-                previousState: PanelState?,
-                newState: PanelState?
+                    panel: View?,
+                    previousState: PanelState?,
+                    newState: PanelState?
             ) {
                 Log.d("$TAG/SUP_L", "onPanelStateChange: previousState: $previousState")
                 Log.d("$TAG/SUP_L", "onPanelStateChange: newState: $newState")
-                if(newState == PanelState.EXPANDED){
+                if (newState == PanelState.EXPANDED) {
                     fab_add.show()
-                }
-                else if(newState == PanelState.DRAGGING){
+                } else if (newState == PanelState.DRAGGING) {
                     fab_add.hide()
                 }
             }
@@ -331,12 +325,12 @@ class CalendarActivity : AppCompatActivity() {
         fab_add.hide()
         fab_add.setOnClickListener( fabClickListener )
 
-        viewModel.toastMessage.observe(this, Observer { res ->
+        viewModel.toastMessage.observe(this) { res ->
             if (res != null) {
                 val message = res.toString()
                 toast(message)
             }
-        })
+        }
     }
 
     override fun onResume() {
@@ -366,10 +360,10 @@ class CalendarActivity : AppCompatActivity() {
 
     inner class RecyclerViewDecoration(private val divHeight: Int) : ItemDecoration() {
         override fun getItemOffsets(
-            outRect: Rect,
-            view: View,
-            parent: RecyclerView,
-            state: RecyclerView.State
+                outRect: Rect,
+                view: View,
+                parent: RecyclerView,
+                state: RecyclerView.State
         ) {
             super.getItemOffsets(outRect, view, parent, state)
             outRect.top = divHeight
