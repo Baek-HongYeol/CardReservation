@@ -57,7 +57,7 @@
                 android:id="@+id/passwordIET"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="@string/password"
+                android:hint="@string/reservation_password"
                 android:inputType="textPassword"
                 android:textSize="17sp" />
         </com.google.android.material.textfield.TextInputLayout>
