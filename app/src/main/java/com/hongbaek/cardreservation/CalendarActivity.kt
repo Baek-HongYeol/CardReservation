@@ -351,7 +351,7 @@ class CalendarActivity : AppCompatActivity() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.setting -> {
-                toast("설정 clicked")
+                start<SettingActivity>()
                 true
             }
             else -> super.onOptionsItemSelected(item)
