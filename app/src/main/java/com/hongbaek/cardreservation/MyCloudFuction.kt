@@ -19,6 +19,74 @@ class MyCloudFuction {
         return functions.getHttpsCallable(name).call(data)
     }
 
+
+    fun deleteSchedule(data:HashMap<String, *>): Task<Map<String, Any>>{
+        Log.d(TAG, "deleteSchedule: sending data: $data")
+        return functionCall("deleteSchedule", data)
+                .continueWith { task ->
+                    var msg1 = ""
+                    var msg2 = ""
+                    var code = 0
+                    var error = ""
+
+                    if(!task.isSuccessful){
+                        var e = task.exception
+                        if (e is FirebaseFunctionsException) {
+                            val ecode = e.code
+                            val details = e.details
+                            Log.e(TAG, "deleteSchedule - error code: $ecode")
+                            Log.e(TAG, "deleteSchedule - error detail: $details")
+                            msg1 = "Error"
+                            code = 12
+                            error = e.details.toString()
+
+                        } else {
+                            Log.e(TAG, "deleteSchedule - error: $e")
+                            msg1 = "Error"
+                            code = 13
+                            error = e?.message.toString()
+                        }
+                    }
+                    else{
+                        try {
+                            var result = task.result as HttpsCallableResult
+                            var map: Map<*, *>
+                            try {
+                                map = result.data as Map<*, *>
+                                if (map.containsKey("message")) {           // 삭제 성공
+                                    code = 1
+                                    Log.d(TAG, "Deletion: Succeed")
+                                } else {                                    // 실패
+                                    try {
+                                        code = if (task.isComplete) 2 else 3
+                                        error = map["error"].toString()
+                                        if(BuildConfig.DEBUG)
+                                            error += "\n =============\n${task.exception}"
+
+                                        Log.d(TAG, "delete: HttpsCallable Result has other data: $map")
+                                        Log.w(TAG, "delete: Task throw Exception: ${task.exception}")
+                                    } catch (e: Exception) {
+                                        code = 10
+                                        error += e.message?:"null"
+                                        Log.e(TAG, "getHttpsCallable.call: $e")
+                                    }
+                                }
+                            } catch (e: ClassCastException) {
+                                code = 11
+                                error += e.message?:"null"
+                                Log.e(TAG, "getHttpsCallable.call: $e")
+                            }
+                        } catch (e: Exception) {
+                            code = 12
+                            error += e.message?:"null"
+                            Log.e(TAG, "getHttpsCallable.call: $e")
+                        }
+                    }
+                    hashMapOf("msg1" to msg1, "msg2" to msg2, "code" to code, "error" to error)
+
+                }
+    }
+
     /** login - password를 전달해 서버에서 인증과 토큰 발급 후 토큰을 받아오는 함수
      * @return HashMap("msg1", "msg2", "code",
      * if   token exists, return code 1, with token.

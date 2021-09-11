@@ -16,6 +16,7 @@ import com.prolificinteractive.materialcalendarview.CalendarDay
 import java.lang.ClassCastException
 import java.util.*
 import kotlin.collections.ArrayList
+import kotlin.collections.HashMap
 
 
 class ReservationListViewModel(val objectID:String) : ViewModel() {
@@ -187,53 +188,42 @@ class ReservationListViewModel(val objectID:String) : ViewModel() {
     }
 
     fun deleteSchedule(position: Int, password:String): Task<Map<String, *>> { // db에 삭제 명령 보내기.
+        var myCF = MyCloudFuction()
         val data = hashMapOf(
                 "password" to password,
                 "refKey" to getList()[position].addedTime
         )
         Log.d(TAG, "deleteSchedule: sending data: $data")
-        return functions.getHttpsCallable("deleteSchedule").call(data)
-                .continueWith { task ->
-                    var result: Any? = null
+        return myCF.deleteSchedule(data)
+                .continueWith{ task ->
+                    var result = task.result as HashMap<String, Any>
                     var msg1 = ""
                     var msg2 = ""
-                    try {
-                        result = task.result as HttpsCallableResult
-                        var data: Map<*, *>
-                        try {
-                            data = result.data as Map<*, *>
-                            if (data.containsKey("message")) {
-                                msg1 = "삭제 완료"
-                                msg2 = data["message"].toString()
-                                Log.d(TAG, "deleteSchedule: HttpsCallable Result has data")
-                            } else {
-                                try {
-                                    msg1 = "삭제 실패"
-                                    if (task.isComplete)
-                                        msg2 = "삭제가 거부되었습니다."
-                                    else
-                                        msg2 = "에러가 발생하였습니다."
-                                    msg2 += "\n" + data["error"]
-                                    Log.d(TAG, "deleteSchedule: HttpsCallable Result has other data: $data")
-                                } catch (e: Exception) {
-                                    msg1 = "Error"
-                                    msg2 = "삭제 실패\n 결과 수신 중 에러가 발생하였습니다.\n${e.message}"
-                                    Log.e(TAG, "getHttpsCallable.call: $e")
-                                }
-                            }
-                        } catch (e: ClassCastException) {
-                            msg1 = "Error"
-                            msg2 = "삭제 실패\n 결과 수신 중 에러가 발생하였습니다.\n${e.message}"
-                            Log.e(TAG, "getHttpsCallable.call: $e")
-                        }
-                    } catch (e: Exception) {
-                        msg1 = "Error"
-                        msg2 = "결과를 받아오지 못했습니다. 새로고침하여 결과를 확인하세요."
-                        Log.e(TAG, "getHttpsCallable.call: $e")
-                    }
-                    if(msg1=="삭제 완료") data["refKey"]?.let { removeItem(position, it) }
-                    hashMapOf("msg1" to msg1, "msg2" to msg2)
+                    var code = result["code"] as Int
 
+                    if(code == 1){
+                        msg1 = "삭제 완료"
+                        msg2 = "Remove Succeed"
+                    }
+                    else if(code == 2 || code == 3){
+                        msg1 = "삭제 실패"
+                        msg2 = if (code == 2) "삭제가 거부되었습니다."
+                                else "에러가 발생하였습니다."
+                        msg2 += "\n" + result["error"]
+                    }
+                    else{
+                        msg1 = "Error"
+                        if (code == 10 || code == 11){
+                            msg2 = "삭제 실패\n 결과 수신 중 에러가 발생하였습니다."
+                        }
+                        else
+                            msg2 = "결과를 받아오지 못했습니다. 새로고침하여 결과를 확인하세요."
+                        if(BuildConfig.DEBUG)
+                            msg2 += "\ntask.exception: " + result["error"]
+                    }
+
+
+                    hashMapOf("msg1" to msg1, "msg2" to msg2, "code" to code)
                 }
     }
 

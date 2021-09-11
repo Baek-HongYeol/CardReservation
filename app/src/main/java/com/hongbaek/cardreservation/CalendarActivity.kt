@@ -11,6 +11,7 @@ import android.view.MenuItem
 import android.view.View
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Observer
@@ -154,67 +155,26 @@ class CalendarActivity : AppCompatActivity() {
                             title = "예약 이름: " + item.title
                             val view = layoutInflater.inflate(R.layout.dialog_delete, null)
                             setView(view)
-                            setPositiveButton(R.string.delete) { _, _ ->
+                            setPositiveButton("삭제") { _, _ ->
                                 val progressBarActivity = ProgressBarActivity(this@CalendarActivity)
                                 progressBarActivity.window!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
                                 progressBarActivity.show()
                                 progressBarActivity.setMessage(R.string.checkPassword)
 
-                                viewModel.deleteSchedule(position, view.findViewById<TextView>(R.id.passwordET).text.toString())
-                                        .addOnCompleteListener { task ->
-                                            if (!task.isSuccessful) {
-                                                val e = task.exception
-                                                if (e is FirebaseFunctionsException) {
-                                                    val code = e.code
-                                                    val details = e.details
-                                                    Log.e(TAG, "deleteSchedule - error code: $code")
-                                                    Log.e(TAG, "deleteSchedule - error detail: $details")
-                                                    alertDialog {
-                                                        title = "Error"
-                                                        if (BuildConfig.DEBUG) message = "오류가 발생했습니다.(DEBUG)\n${e.details}"
-                                                        else message = "오류가 발생했습니다."
-                                                    }.show()
-                                                } else {
-                                                    Log.e(TAG, "deleteSchedule - error: $e")
-                                                    alertDialog {
-                                                        title = "Error"
-                                                        if (BuildConfig.DEBUG) message = "오류가 발생했습니다.(DEBUG)\n${e?.message}"
-                                                        else message = "오류가 발생했습니다."
-                                                    }.show()
-                                                }
-                                                progressBarActivity.dismiss()
-                                            } else {
-                                                val result = task.result
-                                                if (result?.containsKey("msg1") == true) {
-                                                    Log.d(
-                                                            TAG,
-                                                            "deleteSchedule_result - ${result.get("msg1") ?: "null"}"
-                                                    )
-                                                    alertDialog {
-                                                        title = result["msg1"].toString()
-                                                        message = result["msg2"].toString()
-                                                        Log.d(
-                                                                TAG,
-                                                                "deletion complete alertDialog show"
-                                                        )
-                                                        okButton()
-                                                    }.show()
-                                                    progressBarActivity.dismiss()
-                                                } else {
-                                                    Log.d(
-                                                            TAG,
-                                                            "deleteSchedule_result - ${result?.get("msg1") ?: "null"}"
-                                                    )
-                                                    alertDialog {
-                                                        title = "Error"
-                                                        message = "오류가 발생했습니다.\n 새로고침하여 결과를 확인하세요."
-                                                    }
-                                                    progressBarActivity.dismiss()
-                                                }
-                                            }
+                                viewModel.deleteSchedule(position,
+                                        view.findViewById<TextView>(R.id.passwordET).text.toString())
+                                        .continueWith { task ->
+                                            var result = task.result!!
+                                            Log.d(TAG, "deleteSchedule_result - ${result["msg1"] ?: "null"}")
+                                            alertDialog {
+                                                title = result["msg1"].toString()
+                                                message = result["msg2"].toString()
+                                                Log.d(TAG, "deletion complete alertDialog show")
+                                                okButton()
+                                            }.show()
+                                            progressBarActivity.dismiss()
                                             viewModel.reload()
-                                        }
-
+                                }
                             }
                             cancelButton()
                         }.show()
