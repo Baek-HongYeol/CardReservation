@@ -5,8 +5,8 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_margin="3dp"
-    android:background="@color/colorPrimary"
-    app:cardBackgroundColor="@color/backgroundColor"
+    android:background="?attr/colorSurface"
+    app:cardBackgroundColor="?attr/backgroundColor"
     app:cardCornerRadius="5dp"
     app:cardElevation="6dp"
     app:cardMaxElevation="6dp"
@@ -16,6 +16,7 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="?attr/backgroundColor"
         android:layout_marginStart="16dp"
         android:layout_marginTop="8dp"
         android:layout_marginEnd="16dp"
@@ -29,6 +30,7 @@
             android:layout_alignParentTop="true"
             android:layout_marginStart="2dp"
             android:layout_marginTop="1dp"
+            android:background="?attr/backgroundColor"
             android:textAppearance="?android:attr/textAppearanceListItem"
             android:textIsSelectable="false"
             android:textSize="17sp"
@@ -43,7 +45,7 @@
             android:layout_alignParentEnd="true"
             android:layout_centerInParent="true"
             android:layout_toRightOf="@id/itemTitleTV"
-            android:background="#00FFFFFF"
+            android:background="?attr/backgroundColor"
             android:gravity="right"
             android:textAppearance="?android:attr/textAppearanceListItem"
             android:textIsSelectable="false"
@@ -57,6 +59,7 @@
             android:layout_below="@id/itemTitleTV"
             android:layout_marginStart="3dp"
             android:layout_marginTop="5dp"
+            android:background="?attr/backgroundColor"
             tools:text="2020-09-11 16:30 ~ 2020-12-12 20:22" />
 
     </RelativeLayout>

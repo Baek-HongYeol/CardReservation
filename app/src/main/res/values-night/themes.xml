@@ -18,6 +18,8 @@
         <item name="android:actionBarStyle">@style/ActionBarStyle</item>
         <!-- Customize your theme here. -->
 
+        <item name="backgroundColor">@color/backgroundColor</item>          <!-- 원래 배경 색 -->
+
     </style>
 
     <style name="CalendarLayoutTheme" parent="Theme.MaterialComponents.DayNight.DarkActionBar">
@@ -41,6 +43,8 @@
         <item name="android:statusBarColor" tools:targetApi="l">?attr/colorPrimaryVariant</item>
         <item name="android:actionBarStyle">@style/ActionBarStyle</item>
         <!-- Customize your theme here. -->
+        <item name="backgroundColor">@color/backgroundColor</item>          <!-- 원래 배경 색 -->
+        <item name="android:itemBackground">@color/backgroundColor</item>
 
     </style>
 
@@ -55,7 +59,7 @@
     </style>
 
     <style name="ActionBarStyle" parent="@style/Widget.AppCompat.Light.ActionBar.Solid.Inverse">
-        <item name="android:background">?attr/background</item>
+        <item name="android:background">?attr/backgroundColor</item>
         <item name="android:textColor">?attr/colorOnBackground</item>
     </style>
 

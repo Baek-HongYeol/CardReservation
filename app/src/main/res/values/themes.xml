@@ -15,6 +15,7 @@
 
         <item name="colorSurface">@color/white</item>
         <item name="colorOnSurface">@color/black</item>
+        <item name="backgroundColor">@color/backgroundColor</item>      <!-- 원래 배경 색 -->
 
     </style>
     <style name="CalendarLayoutTheme" parent="Theme.MaterialComponents.DayNight">
@@ -35,6 +36,7 @@
         <item name="colorOnSurface">@color/black</item>
         <item name="android:background">@color/panelBackgroundColor</item> <!--캘린더 하위 뷰들의 색상이 연동됨-->
         <item name="colorOnBackground">@color/black</item>
+        <item name="backgroundColor">@color/backgroundColor</item>      <!-- 원래 배경 색 -->
 
     </style>
     <style name="CustomTextAppearance" parent="TextAppearance.MaterialCalendarWidget.Date">

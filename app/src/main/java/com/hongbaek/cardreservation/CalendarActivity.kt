@@ -177,6 +177,14 @@ class CalendarActivity : AppCompatActivity() {
                                 }
                             }
                             cancelButton()
+                        }.onShow {
+                            if (BuildConfig.VERSION_CODE >= 23) {
+                                positiveButton.setTextColor(context.getColor(R.color.colorOnPrimary))
+                                negativeButton.setTextColor(context.getColor(R.color.colorOnPrimary))
+                            } else {
+                                positiveButton.setTextColor(resources.getColor(R.color.colorOnPrimary))
+                                negativeButton.setTextColor(resources.getColor(R.color.colorOnPrimary))
+                            }
                         }.show()
 
                     }
