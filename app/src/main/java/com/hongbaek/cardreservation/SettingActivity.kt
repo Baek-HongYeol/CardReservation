@@ -53,6 +53,13 @@ class SettingActivity : AppCompatActivity() {
             true
         }
 
+        viewModel.getUser()?.getIdToken(false)?.addOnCompleteListener { task ->
+            if(task.isSuccessful){
+                if(task?.result?.claims?.get("admin") as Boolean)
+                    switch.isChecked = true
+            }
+        }
+
         switch.setOnCheckedChangeListener { _, isChecked ->
             if(isChecked){
                 if(passwordIET.text.isNullOrBlank())
