@@ -92,9 +92,8 @@ class SettingActivity : AppCompatActivity() {
                 materialAlertDialog {
                     title = msg1
                     message = msg2
-                    val view = layoutInflater.inflate(R.layout.dialog_return, null)
-                    setView(view)
-                }
+                    cancelButton()
+                }.show()
                 switch.isChecked = false
             }
         }

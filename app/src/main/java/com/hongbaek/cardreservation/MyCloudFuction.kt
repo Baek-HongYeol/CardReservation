@@ -37,13 +37,13 @@ class MyCloudFuction {
                             Log.e(TAG, "deleteSchedule - error code: $ecode")
                             Log.e(TAG, "deleteSchedule - error detail: $details")
                             msg1 = "Error"
-                            code = 12
-                            error = e.details.toString()
+                            code = 13
+                            error = e.details.toString() + "e_code: $ecode"
 
                         } else {
                             Log.e(TAG, "deleteSchedule - error: $e")
                             msg1 = "Error"
-                            code = 13
+                            code = 14
                             error = e?.message.toString()
                         }
                     }
@@ -60,8 +60,6 @@ class MyCloudFuction {
                                     try {
                                         code = if (task.isComplete) 2 else 3
                                         error = map["error"].toString()
-                                        if(BuildConfig.DEBUG)
-                                            error += "\n =============\n${task.exception}"
 
                                         Log.d(TAG, "delete: HttpsCallable Result has other data: $map")
                                         Log.w(TAG, "delete: Task throw Exception: ${task.exception}")
@@ -69,17 +67,24 @@ class MyCloudFuction {
                                         code = 10
                                         error += e.message?:"null"
                                         Log.e(TAG, "getHttpsCallable.call: $e")
+                                        if(BuildConfig.DEBUG)
+                                            error += "\n =======DEBUG=======\n${task.exception}"
                                     }
                                 }
                             } catch (e: ClassCastException) {
                                 code = 11
                                 error += e.message?:"null"
                                 Log.e(TAG, "getHttpsCallable.call: $e")
+                                if(BuildConfig.DEBUG)
+                                    error += "\n =======DEBUG=======\n${task.exception}"
                             }
                         } catch (e: Exception) {
                             code = 12
                             error += e.message?:"null"
                             Log.e(TAG, "getHttpsCallable.call: $e")
+                            if(BuildConfig.DEBUG)
+                                error += "\n =======DEBUG=======\n${task.exception}"
+
                         }
                     }
                     hashMapOf("msg1" to msg1, "msg2" to msg2, "code" to code, "error" to error)
@@ -99,6 +104,7 @@ class MyCloudFuction {
                     var msg1 = ""
                     var msg2 = ""
                     var code = 0
+                    var token = ""
                     try {
                         var result = task.result as HttpsCallableResult
                         var map: Map<*, *>
@@ -108,6 +114,7 @@ class MyCloudFuction {
                                 code = 1
                                 msg1 = "로그인 성공"
                                 msg2 = "인증 되었습니다."
+                                token = map["token"].toString()
                                 Log.d(TAG, "login: Succeed")
                             } else {
                                 try {
@@ -123,32 +130,41 @@ class MyCloudFuction {
                                     msg2 += "\n"
                                     if(BuildConfig.DEBUG) {
                                         msg2 += map["error"]
-                                        msg2 += "\n/\n${task.exception}"
+                                        msg2 += "\n=====Debug======\nexception: ${task.exception}"
                                     }
                                     Log.d(TAG, "login: HttpsCallable Result has other data: $map")
                                     Log.w(TAG, "login: Task throw Exception: ${task.exception}")
                                 } catch (e: Exception) {
                                     msg1 = "Error"
-                                    msg2 = "로그인 실패\n 결과 수신 중 에러가 발생하였습니다.\n${e.message}"
                                     code = 10
-                                    Log.e(TAG, "getHttpsCallable.call: $e")
+                                    msg2 = "로그인 실패\n 결과 수신 중 에러가 발생하였습니다.(code: $code)\n${e.message}"
+                                    hashMapOf("msg1" to msg1, "msg2" to msg2, "code" to code)
+                                    Log.e(TAG, "getHttpsCallable.call(code:$code) : $e")
                                 }
                             }
                         } catch (e: ClassCastException) {
                             msg1 = "Error"
-                            msg2 = "로그인 실패\n 결과 수신 중 에러가 발생하였습니다.\n${e.message}"
                             code = 11
-                            Log.e(TAG, "getHttpsCallable.call: $e")
+                            msg2 = "로그인 실패\n 결과 수신 중 에러가 발생하였습니다.(code: $code)\n${e.message}"
+                            hashMapOf("msg1" to msg1, "msg2" to msg2, "code" to code)
+                            Log.e(TAG, "getHttpsCallable.call(code:$code) : $e")
                         }
                     } catch (e: Exception) {
                         msg1 = "Error"
-                        msg2 = "결과를 받아오지 못했습니다. 새로고침하여 결과를 확인하세요." // ????
                         code = 12
-                        Log.e(TAG, "getHttpsCallable.call: $e")
+                        msg2 = "인증 중 오류가 발생했습니다. 잠시 후 다시 시도하거나 문의해주세요.(code: $code)"
+                        hashMapOf("msg1" to msg1, "msg2" to msg2, "code" to code)
+                        Log.e(TAG, "getHttpsCallable.call(code:$code) : $e")
                     }
                     var messages = hashMapOf("msg1" to msg1, "msg2" to msg2, "code" to code)
                     if(code==1){
-                        messages.put("token", data["token"].toString())
+                        messages["token"] = token
+                        if(token==null) {
+                            messages["code"] = 0
+                            messages["msg2"] = messages["msg2"].toString()+ "\nBut token is not issued"
+                        }
+                        if(BuildConfig.DEBUG)
+                            Log.d(TAG, "token is - $token")
                     }
                     messages
 

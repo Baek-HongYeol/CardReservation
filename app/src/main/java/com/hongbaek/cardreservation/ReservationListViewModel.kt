@@ -193,13 +193,15 @@ class ReservationListViewModel(val objectID:String) : ViewModel() {
                 "password" to password,
                 "refKey" to getList()[position].addedTime
         )
+        var msg1 = ""
+        var msg2 = ""
+        var code = 0
+
         Log.d(TAG, "deleteSchedule: sending data: $data")
         return myCF.deleteSchedule(data)
                 .continueWith{ task ->
                     var result = task.result as HashMap<String, Any>
-                    var msg1 = ""
-                    var msg2 = ""
-                    var code = result["code"] as Int
+                    code = result["code"] as Int
 
                     if(code == 1){
                         msg1 = "삭제 완료"
@@ -222,7 +224,7 @@ class ReservationListViewModel(val objectID:String) : ViewModel() {
                             msg2 += "\ntask.exception: " + result["error"]
                     }
 
-
+                    msg2 += "\n CF_Code: $code"
                     hashMapOf("msg1" to msg1, "msg2" to msg2, "code" to code)
                 }
     }

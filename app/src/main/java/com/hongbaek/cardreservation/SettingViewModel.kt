@@ -20,22 +20,20 @@ class SettingViewModel: ViewModel() {
     private var auth: FirebaseAuth = Firebase.auth
 
     fun login( data: HashMap<String, *> ): Task<HashMap<String, Any>> {
-
         var msg1=""
         var msg2=""
         var code=0
         var myCF = MyCloudFuction()
         return myCF.login(data).continueWith { task ->
             var result = task.result as HashMap<String, Any>
+            code = result["code"] as Int
             if (result.containsKey("msg1") && result.containsKey("msg2")) {
                 msg1 = result["msg1"].toString()
                 msg2 = result["msg2"].toString()
-                code = result["code"] as Int
             } else {
                 try {
                     msg1 = "로그인 실패"
                     msg2 += "\n CF_Code:${result["code"]}"
-                    code = result["code"] as Int
                 } catch (e: Exception) {
                     msg1 = "Error"
                     msg2 = "로그인 실패\n 결과 수신 중 에러가 발생하였습니다.\n${e.message}"
@@ -46,6 +44,7 @@ class SettingViewModel: ViewModel() {
             if(code==1)
                 startSignIn(result["token"].toString())
 
+            msg2 += "\n CF_Code:${result["code"]}"
             hashMapOf("msg1" to msg1, "msg2" to msg2, "code" to code)
         }
     }
