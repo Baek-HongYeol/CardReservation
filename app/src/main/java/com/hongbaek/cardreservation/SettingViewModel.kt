@@ -37,7 +37,7 @@ class SettingViewModel: ViewModel() {
                 } catch (e: Exception) {
                     msg1 = "Error"
                     msg2 = "로그인 실패\n 결과 수신 중 에러가 발생하였습니다.\n${e.message}"
-                    Log.e(TAG, "getHttpsCallable.call: $e")
+                    Log.e(TAG, "login: $e")
                 }
             }
 
@@ -50,6 +50,8 @@ class SettingViewModel: ViewModel() {
     }
 
     private fun startSignIn(customToken: String?) {
+        if(BuildConfig.DEBUG)
+            Log.d(TAG, "Token is - $customToken ")
         customToken?.let {
             auth.signInWithCustomToken(it)
                     .addOnCompleteListener { task ->
@@ -68,9 +70,15 @@ class SettingViewModel: ViewModel() {
         }
     }
 
+    fun logout(){
+        auth.signOut()
+    }
     private fun updatePermission(user: FirebaseUser?) {
         toast("login & token received by ${user?.displayName}")
     }
 
+    fun getUser(): FirebaseUser?{
+        return auth.currentUser
+    }
 
 }

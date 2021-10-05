@@ -21,6 +21,7 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.ItemDecoration
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.functions.FirebaseFunctionsException
 import com.hongbaek.cardreservation.utils.SundayDecorator
 import com.prolificinteractive.materialcalendarview.CalendarDay
@@ -320,6 +321,37 @@ class CalendarActivity : AppCompatActivity() {
         return when (item.itemId) {
             R.id.setting -> {
                 start<SettingActivity>()
+                true
+            }
+            R.id.authentication -> {
+                var user = viewModel.getUser()
+                materialAlertDialog {
+                    title = getString(R.string.account)
+                    okButton()
+                    if (user == null) {
+                        message = "You didn't login."
+                        this.show()
+                    }
+                    else {
+                        var info = ""
+                        info = "Display name: ${user.displayName}\n"
+                        if(user.displayName==null)
+                            info += "isAnonymous: ${user.isAnonymous}\n"
+
+                        if (BuildConfig.DEBUG)
+                            info += "\n======DEBUG========\n" +
+                                    "uid: ${user.uid}\n"
+                        message = info
+                        user.getIdToken(false).addOnCompleteListener { task ->
+                            if (task.isSuccessful) {
+                                if (task.result?.claims?.get("admin") as Boolean) {
+                                    message = info + "\nYou're Admin"
+                                }
+                            }
+                            this.show()
+                        }
+                    }
+                }
                 true
             }
             else -> super.onOptionsItemSelected(item)

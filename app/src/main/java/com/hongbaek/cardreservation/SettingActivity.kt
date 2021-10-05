@@ -5,6 +5,8 @@ import android.graphics.drawable.ColorDrawable
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import android.view.Menu
+import android.view.MenuItem
 import android.view.MotionEvent
 import android.view.View
 import android.widget.ImageButton
@@ -13,7 +15,8 @@ import androidx.activity.viewModels
 import androidx.appcompat.widget.Toolbar
 import com.google.android.material.switchmaterial.SwitchMaterial
 import com.google.android.material.textfield.TextInputEditText
-import splitties.alertdialog.appcompat.message
+import com.google.firebase.auth.FirebaseAuth
+import splitties.alertdialog.appcompat.*
 import splitties.alertdialog.material.materialAlertDialog
 import splitties.toast.toast
 
@@ -59,7 +62,7 @@ class SettingActivity : AppCompatActivity() {
                 }
             }
             else{
-                //updatePermission(null)
+                viewModel.logout()
             }
         }
 
@@ -99,6 +102,47 @@ class SettingActivity : AppCompatActivity() {
         }
 
 
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.menu_setting, menu)
+        return super.onCreateOptionsMenu(menu)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            R.id.authentication -> {
+                var user = viewModel.getUser()
+                materialAlertDialog {
+                    title = getString(R.string.account)
+                    okButton()
+                    if (user == null) {
+                        message = "You didn't login."
+                        this.show()
+                    }
+                    else {
+                        var info = ""
+                        info = "Display name: ${user.displayName}\n" +
+                                "isAnonymous: ${user.isAnonymous}\n" +
+                                ""
+                        if(BuildConfig.DEBUG)
+                            info += "\n======DEBUG========\n" +
+                                    "uid: ${user.uid}\n"
+                        message = info
+                        user.getIdToken(false).addOnCompleteListener { task ->
+                            if(task.isSuccessful){
+                                if(task.result?.claims?.get("admin") as Boolean) {
+                                    message = info + "\nYou're Admin"
+                                }
+                            }
+                            this.show()
+                        }
+                    }
+                }
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
+        }
     }
 
 }

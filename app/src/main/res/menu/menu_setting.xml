@@ -3,9 +3,6 @@
     xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item
-        android:id="@+id/setting"
-        android:title="@string/setting" />
-    <item
         android:id="@+id/authentication"
         android:icon="@drawable/ic_baseline_person_24"
         android:title="@string/account"

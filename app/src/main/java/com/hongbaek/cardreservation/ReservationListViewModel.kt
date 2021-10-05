@@ -5,6 +5,8 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.google.android.gms.tasks.Task
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.database.*
 import com.google.firebase.database.ktx.database
 import com.google.firebase.database.ktx.getValue
@@ -221,7 +223,8 @@ class ReservationListViewModel(val objectID:String) : ViewModel() {
                         else
                             msg2 = "결과를 받아오지 못했습니다. 새로고침하여 결과를 확인하세요."
                         if(BuildConfig.DEBUG)
-                            msg2 += "\ntask.exception: " + result["error"]
+                            msg2 += "===========DEBUG=============\n" +
+                                    "task.exception: " + result["error"]
                     }
 
                     msg2 += "\n CF_Code: $code"
@@ -295,6 +298,9 @@ class ReservationListViewModel(val objectID:String) : ViewModel() {
         }
     }
 
+    fun getUser():FirebaseUser?{
+        return FirebaseAuth.getInstance().currentUser
+    }
     fun getList():ArrayList<ReservationItem>{
         return reservationList.value!!
     }
